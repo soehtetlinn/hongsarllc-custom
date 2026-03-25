@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_service_manager,access_service_manager,model_website_appointment_service,website_appointment_portal.group_website_appointment_manager,1,1,1,1
+access_provider_manager,access_provider_manager,model_website_appointment_provider,website_appointment_portal.group_website_appointment_manager,1,1,1,1
+access_booking_manager,access_booking_manager,model_website_appointment_booking,website_appointment_portal.group_website_appointment_manager,1,1,1,1
+access_booking_portal,access_booking_portal,model_website_appointment_booking,base.group_portal,1,0,0,0
+
+

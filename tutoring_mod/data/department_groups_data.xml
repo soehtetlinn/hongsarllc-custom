@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Create Groups for Departments -->
+        
+        <!-- Administration Group (full access) -->
+        <record id="group_department_administration" model="res.groups">
+            <field name="name">Department: Administration</field>
+            <field name="category_id" ref="base.module_category_administration"/>
+            <field name="comment">Users in Administration department have full system access</field>
+        </record>
+        
+        <!-- Marketing Group -->
+        <record id="group_department_marketing" model="res.groups">
+            <field name="name">Department: Marketing</field>
+            <field name="category_id" ref="base.module_category_administration"/>
+            <field name="comment">Users in Marketing department have access to Marketing and Website (Restricted Content) menus</field>
+        </record>
+        
+        <!-- Operations Group -->
+        <record id="group_department_operations" model="res.groups">
+            <field name="name">Department: Operations</field>
+            <field name="category_id" ref="base.module_category_administration"/>
+            <field name="comment">Users in Operations department have access to everything except Admin and Marketing menus</field>
+        </record>
+        
+        <!-- Teachers Group -->
+        <record id="group_department_teachers" model="res.groups">
+            <field name="name">Department: Teachers</field>
+            <field name="category_id" ref="base.module_category_administration"/>
+            <field name="comment">Users in Teachers department have access to eLearning, Sale, Chatting, Website Restricted, Meeting, Appointment, and Calendar menus</field>
+        </record>
+        
+        <!-- Link Departments to Groups -->
+        <!-- Note: These departments must already exist in the system -->
+        <!-- We use function to link existing departments -->
+        
+        <function model="hr.department" name="_link_department_to_group">
+            <value eval="[('name', '=', 'Administration')]"/>
+            <value eval="ref('group_department_administration')"/>
+        </function>
+        
+        <function model="hr.department" name="_link_department_to_group">
+            <value eval="[('name', '=', 'Marketing')]"/>
+            <value eval="ref('group_department_marketing')"/>
+        </function>
+        
+        <function model="hr.department" name="_link_department_to_group">
+            <value eval="[('name', '=', 'Operations')]"/>
+            <value eval="ref('group_department_operations')"/>
+        </function>
+        
+        <function model="hr.department" name="_link_department_to_group">
+            <value eval="[('name', '=', 'Teachers')]"/>
+            <value eval="ref('group_department_teachers')"/>
+        </function>
+        
+    </data>
+</odoo>
+

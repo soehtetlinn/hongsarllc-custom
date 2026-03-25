@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Menu -->
+    <menuitem id="menu_tutor_root"
+              name="Tutoring"
+              sequence="100"/>
+
+    <!-- Tutor Groups Menu -->
+    <menuitem id="menu_tutor_groups"
+              name="Tutor Groups"
+              parent="menu_tutor_root"
+              action="action_tutor_group"
+              sequence="10"/>
+
+    <!-- Tutor Access Rights Menu -->
+    <menuitem id="menu_tutor_access_rights"
+              name="Tutor Access Rights"
+              parent="menu_tutor_root"
+              action="action_tutor_access_right"
+              sequence="20"/>
+</odoo>
+

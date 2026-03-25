@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mail_server_form_sendgrid" model="ir.ui.view">
+        <field name="name">ir.mail_server.form.sendgrid</field>
+        <field name="model">ir.mail_server</field>
+        <field name="inherit_id" ref="base.view_mail_server_form"/>
+        <field name="arch" type="xml">
+            <field name="smtp_authentication" position="after">
+                <field name="sendgrid_api_key" 
+                       password="True"
+                       invisible="smtp_authentication != 'sendgrid'"
+                       required="smtp_authentication == 'sendgrid'"/>
+            </field>
+            
+            <xpath expr="//group[@name='smtp_config']" position="attributes">
+                <attribute name="invisible">smtp_authentication == 'sendgrid'</attribute>
+            </xpath>
+            
+            <field name="smtp_authentication" position="after">
+                <div class="alert alert-info" role="alert" invisible="smtp_authentication != 'sendgrid'">
+                    <h4>SendGrid API Configuration</h4>
+                    <p><strong>How to get your SendGrid API Key:</strong></p>
+                    <ol>
+                        <li>Sign up at <a href="https://signup.sendgrid.com/" target="_blank">SendGrid.com</a> (free account available)</li>
+                        <li>Go to Settings → API Keys</li>
+                        <li>Click "Create API Key"</li>
+                        <li>Select "Mail Send" permission</li>
+                        <li>Copy the key (starts with "SG.")</li>
+                    </ol>
+                    <p><strong>Verify your sender:</strong></p>
+                    <ol>
+                        <li>Go to <a href="https://app.sendgrid.com/settings/sender_auth/senders" target="_blank">Sender Authentication</a></li>
+                        <li>Create a new sender with your email</li>
+                        <li>Verify the email address</li>
+                    </ol>
+                    <p class="text-success"><i class="fa fa-check-circle"/> Benefits: Bypasses SMTP port blocking, better deliverability, 100 emails/day free!</p>
+                </div>
+            </field>
+        </field>
+    </record>
+</odoo>
+

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit res.partner form view to add tutor fields -->
+    <record id="view_partner_form_tutor" model="ir.ui.view">
+        <field name="name">res.partner.form.tutor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Tutor Groups button in header -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_tutor_groups" type="object" string="Tutor Groups" 
+                        class="oe_stat_button" icon="fa-users" invisible="not is_tutor">
+                    <field name="tutor_group_count" widget="statinfo" string="Groups"/>
+                </button>
+                <button name="action_view_tutor_access_rights" type="object" string="Tutor Access" 
+                        class="oe_stat_button" icon="fa-key" invisible="not is_tutor">
+                    <field name="tutor_access_right_count" widget="statinfo" string="Access Rights"/>
+                </button>
+            </xpath>
+            
+            <!-- Add Tutor tab in notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Tutor Information" name="tutor_info" invisible="not is_tutor">
+                    <group>
+                        <group string="Tutor Groups">
+                            <field name="is_tutor" readonly="1"/>
+                            <field name="tutor_group_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="description"/>
+                                    <field name="tutor_count"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </group>
+                        <group string="Access Rights">
+                            <field name="tutor_access_right_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="access_type"/>
+                                    <field name="resource_name"/>
+                                    <field name="date_granted"/>
+                                    <field name="date_expires"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit res.partner tree view to add tutor indicator -->
+    <record id="view_partner_tree_tutor" model="ir.ui.view">
+        <field name="name">res.partner.tree.tutor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='email']" position="after">
+                <field name="is_tutor" invisible="1"/>
+                <field name="tutor_group_count" optional="hide" widget="statinfo"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

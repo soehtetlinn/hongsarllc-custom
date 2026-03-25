@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stripe_webhook_log_tree" model="ir.ui.view">
+        <field name="name">stripe.webhook.log.tree</field>
+        <field name="model">stripe.webhook.log</field>
+        <field name="arch" type="xml">
+            <list string="Stripe Webhook Logs" decoration-danger="is_failed">
+                <field name="event_id"/>
+                <field name="event_type"/>
+                <field name="status"/>
+                <field name="received_at"/>
+                <field name="processed_at"/>
+                <field name="retry_count"/>
+                <field name="can_retry" invisible="1"/>
+            </list>
+        </field>
+    </record>
+    
+    <record id="view_stripe_webhook_log_form" model="ir.ui.view">
+        <field name="name">stripe.webhook.log.form</field>
+        <field name="model">stripe.webhook.log</field>
+        <field name="arch" type="xml">
+            <form string="Stripe Webhook Log">
+                <header>
+                    <button name="action_retry" string="Retry" type="object" 
+                            class="btn-primary" invisible="can_retry == False"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="event_id"/>
+                            <field name="event_type"/>
+                            <field name="status"/>
+                            <field name="received_at"/>
+                            <field name="processed_at"/>
+                        </group>
+                        <group>
+                            <field name="retry_count"/>
+                            <field name="next_retry_at"/>
+                            <field name="transaction_id"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Error Details" invisible="error_message == False">
+                            <group>
+                                <field name="error_type"/>
+                                <field name="error_message" widget="text"/>
+                                <field name="error_traceback" widget="text" invisible="error_traceback == False"/>
+                                <field name="last_error" widget="text" invisible="last_error == False"/>
+                            </group>
+                        </page>
+                        <page string="Payload">
+                            <field name="raw_payload" widget="text"/>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes" widget="text"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_stripe_webhook_log_search" model="ir.ui.view">
+        <field name="name">stripe.webhook.log.search</field>
+        <field name="model">stripe.webhook.log</field>
+        <field name="arch" type="xml">
+            <search string="Stripe Webhook Logs">
+                <field name="event_id"/>
+                <field name="event_type"/>
+                <field name="status"/>
+                <field name="transaction_id"/>
+                <filter string="Failed" name="failed" domain="[('is_failed', '=', True)]"/>
+                <filter string="Pending Retry" name="pending_retry" 
+                        domain="[('status', '=', 'queued_for_retry')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Event Type" name="group_event_type" context="{'group_by': 'event_type'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'received_at'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="action_stripe_webhook_log" model="ir.actions.act_window">
+        <field name="name">Stripe Webhook Logs</field>
+        <field name="res_model">stripe.webhook.log</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_stripe_webhook_log_search"/>
+        <field name="context">{}</field>
+    </record>
+    
+    <menuitem id="menu_stripe_webhook_log"
+              name="Stripe Webhook Logs"
+              parent="account.menu_finance"
+              action="action_stripe_webhook_log"
+              sequence="100"/>
+</odoo>
+

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tutor Group Tree View -->
+    <record id="view_tutor_group_tree" model="ir.ui.view">
+        <field name="name">tutor.group.tree</field>
+        <field name="model">tutor.group</field>
+        <field name="arch" type="xml">
+            <list string="Tutor Groups" decoration-muted="not active">
+                <field name="name"/>
+                <field name="tutor_count"/>
+                <field name="product_count"/>
+                <field name="course_count"/>
+                <field name="access_right_count"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tutor Group Form View -->
+    <record id="view_tutor_group_form" model="ir.ui.view">
+        <field name="name">tutor.group.form</field>
+        <field name="model">tutor.group</field>
+        <field name="arch" type="xml">
+            <form string="Tutor Group">
+                <header>
+                    <button name="action_view_access_rights" type="object" string="Access Rights" class="oe_stat_button" icon="fa-key">
+                        <field name="access_right_count" widget="statinfo" string="Access Rights"/>
+                    </button>
+                    <button name="action_view_tutors" type="object" string="Tutors" class="oe_stat_button" icon="fa-users">
+                        <field name="tutor_count" widget="statinfo" string="Tutors"/>
+                    </button>
+                    <button name="action_view_products" type="object" string="Products" class="oe_stat_button" icon="fa-cube">
+                        <field name="product_count" widget="statinfo" string="Products"/>
+                    </button>
+                    <button name="action_view_courses" type="object" string="Courses" class="oe_stat_button" icon="fa-graduation-cap">
+                        <field name="course_count" widget="statinfo" string="Courses"/>
+                    </button>
+                    <field name="active" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" placeholder="Enter group name..."/>
+                            <field name="description" placeholder="Enter description..."/>
+                            <field name="department_id" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tutors" name="tutors">
+                            <group>
+                                <field name="user_ids" nolabel="1" 
+                                       context="{'default_user_type': 'tutor'}">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="login"/>
+                                        <field name="user_type"/>
+                                        <field name="teaching_department_id"/>
+                                        <field name="employee_id" optional="hide"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Products" name="products">
+                            <field name="product_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="default_code"/>
+                                    <field name="list_price"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Courses" name="courses">
+                            <field name="course_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="channel_type"/>
+                                    <field name="user_id"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Access Rights" name="access_rights">
+                            <field name="access_right_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="access_type"/>
+                                    <field name="date_granted"/>
+                                    <field name="date_expires"/>
+                                    <field name="active"/>
+                                    <field name="is_expired"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tutor Group Search View -->
+    <record id="view_tutor_group_search" model="ir.ui.view">
+        <field name="name">tutor.group.search</field>
+        <field name="model">tutor.group</field>
+        <field name="arch" type="xml">
+            <search string="Tutor Groups">
+                <field name="name" string="Group Name"/>
+                <field name="user_ids" string="Tutor"/>
+                <field name="department_id" string="Department"/>
+                <field name="product_ids" string="Product"/>
+                <field name="course_ids" string="Course"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Active" name="group_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tutor Group Action -->
+    <record id="action_tutor_group" model="ir.actions.act_window">
+        <field name="name">Tutor Groups</field>
+        <field name="res_model">tutor.group</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Tutor Group!
+            </p>
+            <p>
+                Tutor Groups help you organize tutors and manage their access to products and courses.
+            </p>
+        </field>
+    </record>
+</odoo>
+

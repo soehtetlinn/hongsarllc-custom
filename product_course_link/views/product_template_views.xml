@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_view_course" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.course</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Add one2many field in General Information page for quick access -->
+            <xpath expr="//page[@name='general_information']//group[@name='group_standard_price']" position="after">
+                <field name="channel_ids" invisible="1"/>
+            </xpath>
+            
+            <!-- Fallback: If accounting page doesn't exist, add after Inventory page -->
+            <xpath expr="//notebook//page[last()]" position="after">
+                <page string="Courses" name="courses">
+                    <group>
+                        <div class="oe_button_box" name="button_box_courses_fallback">
+                            <button class="oe_stat_button"
+                                    type="object"
+                                    name="action_open_courses"
+                                    icon="fa-graduation-cap">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="course_count"/>
+                                    </span>
+                                    <span class="o_stat_text">Course<field name="course_count" invisible="1"/><span invisible="course_count != 1">s</span></span>
+                                </div>
+                            </button>
+                        </div>
+                    </group>
+                    <group>
+                        <field name="channel_ids" nolabel="1" readonly="1" context="{'default_product_id': product_variant_ids[0].id if product_variant_ids else False}">
+                            <list string="Courses">
+                                <field name="name"/>
+                                <field name="channel_type"/>
+                                <field name="user_id"/>
+                                <field name="active" widget="boolean_toggle"/>
+                            </list>
+                            <!-- <kanban>
+                                <field name="name"/>
+                                <field name="channel_type"/>
+                                <field name="user_id"/>
+                                <field name="active"/>
+                            </kanban> -->
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

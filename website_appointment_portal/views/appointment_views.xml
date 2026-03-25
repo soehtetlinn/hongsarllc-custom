@@ -1,0 +1,133 @@
+<odoo>
+    <data>
+        <!-- Services -->
+        <record id="view_website_appointment_service_form" model="ir.ui.view">
+            <field name="name">website.appointment.service.form</field>
+            <field name="model">website.appointment.service</field>
+            <field name="arch" type="xml">
+                <form string="Service">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="duration_minutes"/>
+                            <field name="price"/>
+                            <field name="currency_id"/>
+                            <field name="website_published"/>
+                            <field name="description"/>
+                        </group>
+                        <notebook>
+                            <page string="Providers">
+                                <field name="provider_ids" mode="list,form"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_website_appointment_service_list" model="ir.ui.view">
+            <field name="name">website.appointment.service.list</field>
+            <field name="model">website.appointment.service</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="duration_minutes"/>
+                    <field name="price"/>
+                    <field name="website_published"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Providers -->
+        <record id="view_website_appointment_provider_form" model="ir.ui.view">
+            <field name="name">website.appointment.provider.form</field>
+            <field name="model">website.appointment.provider</field>
+            <field name="arch" type="xml">
+                <form string="Provider">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="service_id"/>
+                            <field name="user_id"/>
+                            <field name="work_start"/>
+                            <field name="work_end"/>
+                            <field name="slot_interval_minutes"/>
+                            <field name="slot_capacity"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_website_appointment_provider_list" model="ir.ui.view">
+            <field name="name">website.appointment.provider.list</field>
+            <field name="model">website.appointment.provider</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="service_id"/>
+                    <field name="user_id"/>
+                    <field name="slot_interval_minutes"/>
+                    <field name="slot_capacity"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Bookings -->
+        <record id="view_website_appointment_booking_form" model="ir.ui.view">
+            <field name="name">website.appointment.booking.form</field>
+            <field name="model">website.appointment.booking</field>
+            <field name="arch" type="xml">
+                <form string="Booking">
+                    <sheet>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="service_id"/>
+                            <field name="provider_id"/>
+                            <field name="partner_id"/>
+                            <field name="datetime_start"/>
+                            <field name="datetime_end" readonly="1"/>
+                            <field name="state"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_website_appointment_booking_list" model="ir.ui.view">
+            <field name="name">website.appointment.booking.list</field>
+            <field name="model">website.appointment.booking</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+                    <field name="service_id"/>
+                    <field name="provider_id"/>
+                    <field name="partner_id"/>
+                    <field name="datetime_start"/>
+                    <field name="datetime_end"/>
+                    <field name="state"/>
+                </list>
+            </field>
+        </record>
+
+        <record id="action_website_appointment_service" model="ir.actions.act_window">
+            <field name="name">Services</field>
+            <field name="res_model">website.appointment.service</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_website_appointment_provider" model="ir.actions.act_window">
+            <field name="name">Providers</field>
+            <field name="res_model">website.appointment.provider</field>
+            <field name="view_mode">list,form</field>
+        </record>
+
+        <record id="action_website_appointment_booking" model="ir.actions.act_window">
+            <field name="name">Bookings</field>
+            <field name="res_model">website.appointment.booking</field>
+            <field name="view_mode">list,form</field>
+        </record>
+    </data>
+</odoo>
+
+

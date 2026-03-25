@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="website_appointment_services" name="Appointment Services">
+      <t t-call="website.layout">
+        <div class="container my-5">
+          <h2>Appointment Services</h2>
+          <div class="row">
+            <t t-foreach="services" t-as="service">
+              <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title" t-esc="service.name"/>
+                    <p class="card-text" t-raw="service.description or ''"/>
+                    <a t-attf-href="/appointments/#{service.id}" class="btn btn-primary">View</a>
+                  </div>
+                </div>
+              </div>
+            </t>
+          </div>
+        </div>
+      </t>
+    </template>
+
+    <template id="website_appointment_service_detail" name="Appointment Service Detail">
+      <t t-call="website.layout">
+        <div class="container my-5" id="appointment-detail" t-att-data-service-id="service.id">
+          <h2 t-esc="service.name"/>
+          <div class="mb-3" t-raw="service.description or ''"/>
+        <div class="row align-items-end g-3">
+            <div class="col-md-4">
+              <label class="form-label">Provider</label>
+              <select class="form-select" id="provider_id">
+                <t t-foreach="providers" t-as="p">
+                  <option t-att-value="p.id" t-esc="p.name"/>
+                </t>
+              </select>
+            </div>
+          <div class="col-md-2">
+            <label class="form-label">Number of people</label>
+            <select class="form-select" id="num_people">
+              <t t-foreach="[1,2,3,4,5,6,7,8,9,10]" t-as="n">
+                <option t-att-value="n"><t t-esc="n"/></option>
+              </t>
+            </select>
+          </div>
+            <div class="col-md-4">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" id="date_from"/>
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-secondary" id="load_slots">Load Slots</button>
+            </div>
+          </div>
+          <hr/>
+        <div id="slots" class="row g-2"></div>
+        <div id="available_info" class="mt-2 text-danger small"></div>
+        </div>
+      </t>
+    </template>
+</odoo>
+
+

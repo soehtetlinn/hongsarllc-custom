@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tutor Access Right Tree View -->
+    <record id="view_tutor_access_right_tree" model="ir.ui.view">
+        <field name="name">tutor.access.right.tree</field>
+        <field name="model">tutor.access.right</field>
+        <field name="arch" type="xml">
+            <list string="Tutor Access Rights" decoration-danger="is_expired" decoration-muted="not active">
+                <field name="name"/>
+                <field name="tutor_name"/>
+                <field name="resource_name"/>
+                <field name="access_type"/>
+                <field name="date_granted"/>
+                <field name="date_expires"/>
+                <field name="active" widget="boolean_toggle"/>
+                <field name="is_expired"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Tutor Access Right Form View -->
+    <record id="view_tutor_access_right_form" model="ir.ui.view">
+        <field name="name">tutor.access.right.form</field>
+        <field name="model">tutor.access.right</field>
+        <field name="arch" type="xml">
+            <form string="Tutor Access Right">
+                <header>
+                    <field name="active" widget="boolean_toggle"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="access_type" options="{'no_create': True}"/>
+                            <field name="date_granted"/>
+                            <field name="date_expires"/>
+                        </group>
+                        <group>
+                            <field name="tutor_group_id" options="{'no_create': True}"/>
+                            <field name="user_id" options="{'no_create': True}" 
+                                   domain="[('share', '=', False)]"
+                                   placeholder="Select a tutor (user_type=tutor)..."/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="product_id" options="{'no_create': True}"/>
+                            <field name="product_template_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="course_id" options="{'no_create': True}"/>
+                            <field name="is_expired" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <field name="notes" placeholder="Add notes about this access right..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tutor Access Right Search View -->
+    <record id="view_tutor_access_right_search" model="ir.ui.view">
+        <field name="name">tutor.access.right.search</field>
+        <field name="model">tutor.access.right</field>
+        <field name="arch" type="xml">
+            <search string="Tutor Access Rights">
+                <field name="name"/>
+                <field name="tutor_group_id"/>
+                <field name="user_id"/>
+                <field name="product_id"/>
+                <field name="product_template_id"/>
+                <field name="course_id"/>
+                <field name="access_type"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Expired" name="expired" domain="[('is_expired', '=', True)]"/>
+                <filter string="Not Expired" name="not_expired" domain="[('is_expired', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Tutor Group" name="group_tutor_group" context="{'group_by': 'tutor_group_id'}"/>
+                    <filter string="Access Type" name="group_access_type" context="{'group_by': 'access_type'}"/>
+                    <filter string="Date Granted" name="group_date_granted" context="{'group_by': 'date_granted'}"/>
+                    <filter string="Active" name="group_active" context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Tutor Access Right Action -->
+    <record id="action_tutor_access_right" model="ir.actions.act_window">
+        <field name="name">Tutor Access Rights</field>
+        <field name="res_model">tutor.access.right</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first Tutor Access Right!
+            </p>
+            <p>
+                Tutor Access Rights define what resources (products, courses) tutors have access to and what level of access they have.
+            </p>
+        </field>
+    </record>
+</odoo>
+

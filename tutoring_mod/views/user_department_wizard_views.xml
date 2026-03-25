@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- User Department Assignment Wizard Form View -->
+    <record id="view_user_department_wizard_form" model="ir.ui.view">
+        <field name="name">user.department.wizard.form</field>
+        <field name="model">user.department.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Assign Users to Department">
+                <group>
+                    <field name="department_id" options="{'no_create': True}" 
+                           placeholder="Select a department..."/>
+                    <field name="auto_assign_group"/>
+                </group>
+                <group>
+                    <field name="user_ids" nolabel="1" 
+                           domain="[('share', '=', False)]"
+                           placeholder="Select users to assign...">
+                        <list>
+                            <field name="name"/>
+                            <field name="login"/>
+                            <field name="user_type"/>
+                            <field name="teaching_department_id" string="Current Department"/>
+                        </list>
+                    </field>
+                </group>
+                <footer>
+                    <button name="action_assign_department" string="Assign to Department" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- User Department Assignment Wizard Action -->
+    <record id="action_user_department_wizard" model="ir.actions.act_window">
+        <field name="name">Assign Users to Department</field>
+        <field name="res_model">user.department.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_user_ids': active_ids if active_ids else []}</field>
+    </record>
+</odoo>
+

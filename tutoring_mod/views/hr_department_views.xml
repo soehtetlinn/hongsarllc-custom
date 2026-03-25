@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit hr.department form view to add tutoring fields -->
+    <record id="view_department_form_tutoring" model="ir.ui.view">
+        <field name="name">hr.department.form.tutoring</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_form"/>
+        <field name="arch" type="xml">
+            <!-- Add stat buttons for tutors, students, operators -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="action" string="Tutors" 
+                        class="oe_stat_button" icon="fa-users"
+                        name="base.action_res_users"
+                        context="{'search_default_user_type': 'tutor', 'search_default_teaching_department_id': id}">
+                    <field name="tutor_count" widget="statinfo" string="Tutors"/>
+                </button>
+                <button type="action" string="Students" 
+                        class="oe_stat_button" icon="fa-user-graduate"
+                        name="base.action_res_users"
+                        context="{'search_default_user_type': 'student', 'search_default_teaching_department_id': id}">
+                    <field name="student_count" widget="statinfo" string="Students"/>
+                </button>
+                <button type="action" string="Operators" 
+                        class="oe_stat_button" icon="fa-user-cog"
+                        name="base.action_res_users"
+                        context="{'search_default_user_type': 'operator', 'search_default_teaching_department_id': id}">
+                    <field name="operator_count" widget="statinfo" string="Operators"/>
+                </button>
+            </xpath>
+            
+            <!-- Add Group field -->
+            <xpath expr="//field[@name='manager_id']" position="after">
+                <field name="group_id" options="{'no_create': True}" 
+                       help="Link this department to an Odoo group. Users in this department will be automatically assigned to this group."/>
+            </xpath>
+            
+            <!-- Add Assign Users button -->
+            <xpath expr="//field[@name='parent_id']" position="after">
+                <button name="%(action_user_department_wizard)d" 
+                        type="action" 
+                        string="Assign Users to Department" 
+                        class="oe_link"
+                        context="{'default_department_id': id, 'default_auto_assign_group': True}"/>
+            </xpath>
+            
+            <!-- Add Users section before chatter -->
+            <xpath expr="//chatter" position="before">
+                <notebook>
+                    <page string="Users" name="users_tutoring">
+                        <group>
+                            <group string="All Users">
+                                <field name="user_ids" nolabel="1">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="login"/>
+                                        <field name="user_type"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Tutors">
+                                <field name="tutor_ids" nolabel="1">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="login"/>
+                                        <field name="employee_id" optional="hide"/>
+                                        <field name="active"/>
+                                    </list>
+                                </field>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit hr.department tree view to add counts -->
+    <record id="view_department_tree_tutoring" model="ir.ui.view">
+        <field name="name">hr.department.tree.tutoring</field>
+        <field name="model">hr.department</field>
+        <field name="inherit_id" ref="hr.view_department_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='manager_id']" position="after">
+                <field name="tutor_count" optional="hide"/>
+                <field name="student_count" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

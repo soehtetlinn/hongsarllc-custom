@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit res.users form view to add tutor fields -->
+    <record id="view_users_form_tutor" model="ir.ui.view">
+        <field name="name">res.users.form.tutor</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <!-- Add User Type and Teaching Department fields -->
+            <xpath expr="//field[@name='login']" position="after">
+                <field name="user_type"/>
+                <field name="teaching_department_id" options="{'no_create': True}" 
+                       placeholder="Select HR Department..."/>
+            </xpath>
+            
+            <!-- Add Department Assignment button -->
+            <xpath expr="//header" position="inside">
+                <button name="%(action_user_department_wizard)d" 
+                        type="action" 
+                        string="Change Department" 
+                        class="oe_stat_button" 
+                        icon="fa-building"
+                        context="{'default_user_ids': [id], 'default_department_id': teaching_department_id, 'default_auto_assign_group': True}"/>
+            </xpath>
+            
+            <!-- Add Tutor Groups button in header -->
+            <xpath expr="//header" position="inside">
+                <button name="action_view_tutor_groups" type="object" string="Tutor Groups" 
+                        class="oe_stat_button" icon="fa-users" invisible="not is_tutor">
+                    <field name="tutor_group_count" widget="statinfo" string="Groups"/>
+                </button>
+                <button name="action_view_tutor_access_rights" type="object" string="Tutor Access" 
+                        class="oe_stat_button" icon="fa-key" invisible="not is_tutor">
+                    <field name="tutor_access_right_count" widget="statinfo" string="Access Rights"/>
+                </button>
+            </xpath>
+            
+            <!-- Add Tutor tab in notebook -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Tutor Information" name="tutor_info" invisible="not is_tutor">
+                    <group>
+                        <group string="Tutor Groups">
+                            <field name="is_tutor" readonly="1"/>
+                            <field name="tutor_group_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="description"/>
+                                    <field name="tutor_count"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </group>
+                        <group string="Access Rights">
+                            <field name="tutor_access_right_ids" nolabel="1">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="access_type"/>
+                                    <field name="resource_name"/>
+                                    <field name="date_granted"/>
+                                    <field name="date_expires"/>
+                                    <field name="active"/>
+                                </list>
+                            </field>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Inherit res.users tree view to add tutor indicator -->
+    <record id="view_users_tree_tutor" model="ir.ui.view">
+        <field name="name">res.users.tree.tutor</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='login']" position="after">
+                <field name="user_type"/>
+                <field name="teaching_department_id" optional="hide" string="Department"/>
+                <field name="is_tutor" invisible="1"/>
+                <field name="tutor_group_count" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+

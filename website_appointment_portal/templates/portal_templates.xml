@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="portal_my_appointments" name="My Appointments">
+    <t t-call="portal.portal_layout">
+      <t t-set="breadcrumbs" t-value="[('My Account','/my'), ('Appointments','/my/appointments')]"/>
+      <div class="o_portal_wrap">
+        <h3>My Appointments</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Service</th>
+              <th>Provider</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <t t-foreach="bookings" t-as="b">
+              <tr>
+                <td t-esc="b.name"/>
+                <!-- <td t-esc="b.service_id.name"/>
+                <td t-esc="b.provider_id.name"/>
+                <td><span t-esc="b.start"/></td>
+                <td><span t-esc="b.stop"/></td>
+                <td><span t-esc="b.state"/></td> -->
+              </tr>
+            </t>
+          </tbody>
+        </table>
+      </div>
+    </t>
+  </template>
+
+  <template id="portal_my_home_appointments" inherit_id="portal.portal_my_home" name="My Account: My Appointments Card">
+    <xpath expr="//div[@id='portal_common_category']" position="inside">
+      <t t-call="portal.portal_docs_entry">
+        <t t-set="icon" t-value="'/website_appointment_portal/static/src/img/appointments.svg'"/>
+        <t t-set="title">My Appointments</t>
+        <t t-set="text">View and manage your appointments</t>
+        <t t-set="url" t-value="'/my/custom-appointments'"/>
+        <t t-set="config_card" t-value="True"/>
+      </t>
+    </xpath>
+  </template>
+
+  <template id="portal_side_appointments_link" inherit_id="portal.side_content" name="Side: My Appointments Link">
+    <xpath expr="//div[hasclass('o_portal_my_details')]" position="after">
+      <a role="button" href="/my/custom-appointments" class="btn btn-link p-0 mt-2"><i class="fa fa-calendar"/> My Appointments</a>
+    </xpath>
+  </template>
+</odoo>
+
+

@@ -1,0 +1,54 @@
+// Sticky columns in list view - keep first columns fixed when horizontal scroll
+.o_list_renderer.o_list_sticky_columns {
+    .o_list_table {
+        th,
+        td {
+            &.o_sticky_column {
+                position: sticky;
+                z-index: 2;
+                background: var(--ListRenderer-thead-bg-color, #fff);
+                box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.1);
+            }
+
+            &.o_sticky_column_0 {
+                left: 0;
+                z-index: 3;
+            }
+
+            &.o_sticky_column_1 {
+                left: var(--sticky-col-0-width, 0);
+                z-index: 2;
+            }
+
+            &.o_sticky_column_2 {
+                left: calc(var(--sticky-col-0-width, 0) + var(--sticky-col-1-width, 0));
+                z-index: 1;
+            }
+        }
+
+        thead th.o_sticky_column {
+            background: var(--ListRenderer-thead-bg-color, #fff);
+
+            &.table-active {
+                background: var(--ListRenderer-thead-bg-active-color, #e9ecef);
+            }
+        }
+
+        tbody td.o_sticky_column {
+            background: var(--table-bg, #fff);
+        }
+
+        tbody tr:hover td.o_sticky_column {
+            background: var(--table-hover-bg, rgba(0, 0, 0, 0.04));
+        }
+
+        tbody tr.table-info td.o_sticky_column,
+        tbody tr.o_data_row_selected td.o_sticky_column {
+            background: var(--table-accent-bg, rgba(13, 110, 253, 0.15));
+        }
+
+        tfoot td.o_sticky_column {
+            background: var(--ListRenderer-tfoot-bg-color, #fff);
+        }
+    }
+}

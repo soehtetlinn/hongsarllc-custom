@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_user_department_wizard_user,access.user.department.wizard.user,model_user_department_wizard,base.group_user,1,1,1,1
+access_user_department_wizard_manager,access.user.department.wizard.manager,model_user_department_wizard,base.group_system,1,1,1,1
+access_tutor_group_user,access.tutor.group.user,model_tutor_group,base.group_user,1,1,1,1
+access_tutor_group_manager,access.tutor.group.manager,model_tutor_group,base.group_system,1,1,1,1
+access_tutor_access_right_user,access.tutor.access.right.user,model_tutor_access_right,base.group_user,1,1,1,1
+access_tutor_access_right_manager,access.tutor.access.right.manager,model_tutor_access_right,base.group_system,1,1,1,1
+

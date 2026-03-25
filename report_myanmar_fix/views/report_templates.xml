@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 
+    Myanmar PDF Font Fix
+    ====================
+    This module fixes Myanmar/Burmese Unicode text rendering in PDF reports.
+    
+    wkhtmltopdf cannot properly render Myanmar Unicode due to missing complex 
+    text shaping (HarfBuzz) support. This module uses WeasyPrint instead,
+    which has proper HarfBuzz support for Myanmar script.
+    -->
+    <template id="report_layout_myanmar_font" inherit_id="web.report_layout">
+        <xpath expr="//head/style" position="replace">
+            <style>
+                /* Myanmar Unicode font support for PDF reports */
+                /* WeasyPrint will use these fonts for proper rendering */
+                body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6 {
+                    font-family: 'Noto Sans Myanmar', 'Padauk', 'Lato', 'Lucida Grande', Helvetica, Verdana, Arial, sans-serif !important;
+                }
+            </style>
+        </xpath>
+    </template>
+</odoo>

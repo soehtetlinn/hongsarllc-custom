@@ -1,0 +1,11 @@
+<odoo>
+    <data>
+        <menuitem id="menu_website_appointment_root" name="Website Appointments" parent="website.menu_website_configuration" groups="website_appointment_portal.group_website_appointment_manager" sequence="90"/>
+
+        <menuitem id="menu_website_appointment_service" name="Services" parent="menu_website_appointment_root" action="action_website_appointment_service"/>
+        <menuitem id="menu_website_appointment_provider" name="Providers" parent="menu_website_appointment_root" action="action_website_appointment_provider"/>
+        <menuitem id="menu_website_appointment_booking" name="Bookings" parent="menu_website_appointment_root" action="action_website_appointment_booking"/>
+    </data>
+</odoo>
+
+
