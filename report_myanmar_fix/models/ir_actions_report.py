@@ -120,8 +120,9 @@ class IrActionsReport(models.Model):
                 return (
                     m.group(1)
                     + '<div class="o_weasy_running_header">'
+                    + '<div class="o_weasy_running_inset">'
                     + header_content
-                    + '</div>'
+                    + '</div></div>'
                 )
 
             body = re.sub(r'(<body[^>]*>)', _after_open_body, body, count=1, flags=re.IGNORECASE)
@@ -130,8 +131,9 @@ class IrActionsReport(models.Model):
             def _before_close_body(m):
                 return (
                     '<div class="o_weasy_running_footer">'
+                    + '<div class="o_weasy_running_inset">'
                     + footer_content
-                    + '</div>'
+                    + '</div></div>'
                     + m.group(1)
                 )
 
@@ -139,7 +141,9 @@ class IrActionsReport(models.Model):
 
         return body, bool(header_content), bool(footer_content)
 
-    def _weasyprint_margins_mm(self, paperformat_id, specific_paperformat_args):
+    def _weasyprint_margins_mm(
+            self, paperformat_id, specific_paperformat_args,
+            has_running_header=False, has_running_footer=False):
         """Match Odoo wkhtmltopdf margins; left/right forced equal (max of both) for even gutters."""
         args = specific_paperformat_args or {}
         mt = float(args.get('data-report-margin-top') or (paperformat_id.margin_top if paperformat_id else 40))
@@ -147,6 +151,12 @@ class IrActionsReport(models.Model):
         ml = float(paperformat_id.margin_left if paperformat_id else 7)
         mr = float(paperformat_id.margin_right if paperformat_id else 7)
         mlr = max(ml, mr)
+        # Running headers/footers paint in @page margin boxes; a bit more room avoids clipping
+        # (especially with Myanmar ascenders / Bootstrap grid overflow).
+        if has_running_header:
+            mt += 6.0
+        if has_running_footer:
+            mb += 4.0
         return mt, mb, mlr
 
     def _weasyprint_page_size_css(self, paperformat_id, landscape):
@@ -166,7 +176,8 @@ class IrActionsReport(models.Model):
             has_running_header,
             has_running_footer,
     ):
-        mt, mb, mlr = self._weasyprint_margins_mm(paperformat_id, specific_paperformat_args)
+        mt, mb, mlr = self._weasyprint_margins_mm(
+            paperformat_id, specific_paperformat_args, has_running_header, has_running_footer)
         size = self._weasyprint_page_size_css(paperformat_id, landscape)
 
         # Running header/footer: repeats on every page (WeasyPrint / CSS GCPM)
@@ -175,18 +186,16 @@ class IrActionsReport(models.Model):
             page_extra.append('''
             @top-center {
                 content: element(weasy-doc-header);
-                width: 100%;
                 vertical-align: bottom;
-                padding-bottom: 2mm;
+                padding: 2mm 6mm 6mm 6mm;
                 margin: 0;
             }''')
         if has_running_footer:
             page_extra.append('''
             @bottom-center {
                 content: element(weasy-doc-footer);
-                width: 100%;
                 vertical-align: top;
-                padding-top: 2mm;
+                padding: 6mm 6mm 2mm 6mm;
                 margin: 0;
             }''')
 
@@ -205,6 +214,8 @@ class IrActionsReport(models.Model):
                 position: running(weasy-doc-header);
                 width: 100%;
                 box-sizing: border-box;
+                overflow: visible !important;
+                line-height: 1.55 !important;
             }
             ''')
         if has_running_footer:
@@ -213,6 +224,8 @@ class IrActionsReport(models.Model):
                 position: running(weasy-doc-footer);
                 width: 100%;
                 box-sizing: border-box;
+                overflow: visible !important;
+                line-height: 1.55 !important;
             }
             ''')
 
@@ -226,12 +239,79 @@ class IrActionsReport(models.Model):
             body, html {{
                 overflow: visible !important;
             }}
-            /* Full width inside page margins (avoid narrow content + uneven sides) */
+            /* Same horizontal inset as body + room for tall glyphs */
+            .o_weasy_running_header .o_weasy_running_inset,
+            .o_weasy_running_footer .o_weasy_running_inset {{
+                padding: 3mm 11mm 2mm 11mm;
+                box-sizing: border-box !important;
+                overflow: visible !important;
+            }}
+            /* Bootstrap .row uses negative side margins; in WeasyPrint margin boxes that pulls
+               content past the clip rect and chops the first/last columns (boxed layout headers). */
+            .o_weasy_running_header .row,
+            .o_weasy_running_footer .row {{
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                --bs-gutter-x: 0.75rem;
+            }}
+            .o_weasy_running_header .header,
+            .o_weasy_running_header .header .d-flex,
+            .o_weasy_running_header .header [class*="col-"],
+            .o_weasy_running_footer .footer,
+            .o_weasy_running_footer .o_footer_content {{
+                overflow: visible !important;
+            }}
+            /* WeasyPrint + position:running can collapse flex columns so company logos paint at 0×0 */
+            .o_weasy_running_header img,
+            .o_weasy_running_footer img {{
+                flex-shrink: 0 !important;
+                min-width: 0.5mm !important;
+                min-height: 8mm !important;
+                height: auto !important;
+                width: auto !important;
+                object-fit: contain !important;
+                box-sizing: content-box !important;
+                display: block !important;
+            }}
+            .o_weasy_running_header [class*="col-"]:first-child,
+            .o_weasy_running_header .header .d-flex > :first-child {{
+                flex-shrink: 0 !important;
+                min-width: min-content !important;
+            }}
+            /* Match Odoo report inner gutters (see web report.scss $o-default-report-margins).
+               Zero padding flushed Myanmar/Latin glyphs against the page box and WeasyPrint
+               clipped ascenders and table edge text; restore side inset + top breathing room. */
             body.o_body_pdf.container {{
                 max-width: none !important;
                 width: 100% !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
+                box-sizing: border-box !important;
+                padding-left: 11mm !important;
+                padding-right: 11mm !important;
+                padding-top: 3mm !important;
+            }}
+            body.o_body_pdf.o_css_margins.container {{
+                padding-top: 0 !important;
+            }}
+            body.o_body_pdf.o_css_margins .header {{
+                padding-top: 11mm !important;
+            }}
+            body.o_body_pdf.o_css_margins .footer > .o_footer_content {{
+                padding-bottom: 11mm !important;
+            }}
+            /* report_tables.scss zeros first/last cell padding; restore min inset so edge columns are not clipped */
+            .o_table_standard table:not(.o_ignore_layout_styling) th:first-child,
+            .o_table_standard table:not(.o_ignore_layout_styling) td:first-child {{
+                padding-left: 0.5rem !important;
+            }}
+            .o_table_standard table:not(.o_ignore_layout_styling) th:last-child,
+            .o_table_standard table:not(.o_ignore_layout_styling) td:last-child {{
+                padding-right: 0.5rem !important;
+            }}
+            body.o_body_pdf td, body.o_body_pdf th {{
+                overflow: visible !important;
+            }}
+            body.o_body_pdf, body.o_body_pdf table {{
+                line-height: 1.55 !important;
             }}
             body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6,
             address, strong, b, i, em, small, .page, article,
