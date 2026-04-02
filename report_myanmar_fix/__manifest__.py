@@ -31,8 +31,12 @@ Usage:
 Simply install this module. It automatically fixes all PDF reports containing Myanmar text.
     """,
     'author': 'Custom',
-    'depends': ['base', 'web'],
-    'data': ['views/report_templates.xml'],
+    'depends': ['base', 'web', 'sale', 'account'],
+    'data': [
+        'views/report_templates.xml',
+        'views/sale_report_templates.xml',
+        'views/account_invoice_report_action.xml',
+    ],
     'external_dependencies': {
         'python': ['weasyprint'],
     },

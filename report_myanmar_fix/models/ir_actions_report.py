@@ -109,11 +109,17 @@ class IrActionsReport(models.Model):
             match = re.search(r'<body[^>]*>(.*?)</body>', header, re.DOTALL | re.IGNORECASE)
             if match:
                 header_content = match.group(1).strip()
+            else:
+                # Some layouts provide header/footer HTML fragments without <body> tags.
+                # In that case, inject the full fragment as-is.
+                header_content = header.strip()
 
         if footer:
             match = re.search(r'<body[^>]*>(.*?)</body>', footer, re.DOTALL | re.IGNORECASE)
             if match:
                 footer_content = match.group(1).strip()
+            else:
+                footer_content = footer.strip()
 
         if header_content:
             def _after_open_body(m):
@@ -128,16 +134,18 @@ class IrActionsReport(models.Model):
             body = re.sub(r'(<body[^>]*>)', _after_open_body, body, count=1, flags=re.IGNORECASE)
 
         if footer_content:
-            def _before_close_body(m):
+            def _after_open_body_for_footer(m):
                 return (
-                    '<div class="o_weasy_running_footer">'
+                    m.group(1)
+                    + '<div class="o_weasy_running_footer">'
                     + '<div class="o_weasy_running_inset">'
                     + footer_content
                     + '</div></div>'
-                    + m.group(1)
                 )
 
-            body = re.sub(r'(</body>)', _before_close_body, body, count=1, flags=re.IGNORECASE)
+            # For running elements, placing footer at end of body may make it available only on
+            # trailing pages in WeasyPrint. Inject right after <body> so it applies to all pages.
+            body = re.sub(r'(<body[^>]*>)', _after_open_body_for_footer, body, count=1, flags=re.IGNORECASE)
 
         return body, bool(header_content), bool(footer_content)
 
@@ -187,16 +195,19 @@ class IrActionsReport(models.Model):
             @top-center {
                 content: element(weasy-doc-header);
                 vertical-align: bottom;
+                text-align: left;
                 padding: 2mm 6mm 6mm 6mm;
                 margin: 0;
+                width: 100%;
             }''')
         if has_running_footer:
             page_extra.append('''
             @bottom-center {
                 content: element(weasy-doc-footer);
                 vertical-align: top;
-                padding: 6mm 6mm 2mm 6mm;
+                padding: 4mm 6mm 1.5mm 6mm;
                 margin: 0;
+                width: 100%;
             }''')
 
         page_rule = f'''
@@ -242,9 +253,13 @@ class IrActionsReport(models.Model):
             /* Same horizontal inset as body + room for tall glyphs */
             .o_weasy_running_header .o_weasy_running_inset,
             .o_weasy_running_footer .o_weasy_running_inset {{
-                padding: 3mm 11mm 2mm 11mm;
+                padding: 3mm 11mm 1mm 11mm;
                 box-sizing: border-box !important;
                 overflow: visible !important;
+            }}
+            /* Footer only: reduce bottom inset further to avoid blank trailing pages */
+            .o_weasy_running_footer .o_weasy_running_inset {{
+                padding-bottom: 0.8mm !important;
             }}
             /* Bootstrap .row uses negative side margins; in WeasyPrint margin boxes that pulls
                content past the clip rect and chops the first/last columns (boxed layout headers). */
@@ -278,6 +293,70 @@ class IrActionsReport(models.Model):
                 flex-shrink: 0 !important;
                 min-width: min-content !important;
             }}
+            /* Letterhead: company block left-aligned like standard documents (Odoo boxed/bubble use text-end + space-between) */
+            .o_weasy_running_header .text-end,
+            .o_weasy_running_header [name="company_address"].text-end {{
+                text-align: left !important;
+            }}
+            .o_weasy_running_header .float-end {{
+                float: none !important;
+            }}
+            .o_weasy_running_header .header .row {{
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }}
+            .o_weasy_running_header .header .row > [class*="col-"] {{
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: 0 0 auto !important;
+            }}
+            .o_weasy_running_header .header .row > [class*="offset-"] {{
+                margin-left: 0 !important;
+            }}
+            .o_weasy_running_header .header .d-flex.justify-content-between,
+            .o_weasy_running_header .o_folder_company_info.d-flex.justify-content-between,
+            .o_weasy_running_header .d-flex.justify-content-between.align-items-center {{
+                justify-content: flex-start !important;
+                align-items: flex-start !important;
+                gap: 0.75rem !important;
+            }}
+            /* Recipient / customer block: Odoo uses col-5 ms-auto which pushes address to the right in PDF */
+            body.o_body_pdf .address.row div[name="address"] {{
+                margin-left: 0 !important;
+                margin-inline-start: 0 !important;
+                align-self: flex-start !important;
+            }}
+            body.o_body_pdf .address.row {{
+                justify-content: flex-start !important;
+            }}
+            /* Bubble (and similar): title was flexed to the opposite side of the customer block */
+            body.o_body_pdf .article > div.d-flex.justify-content-between.align-items-end {{
+                justify-content: flex-start !important;
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }}
+            body.o_body_pdf .article > div.d-flex.justify-content-between.align-items-end > h2.text-end {{
+                text-align: left !important;
+                align-self: flex-start !important;
+                width: 100%;
+            }}
+            /* Bubble + quotations: h2 keeps text-end even when parent has no d-flex (e.g. information_block) */
+            body.o_body_pdf .article h2.text-end {{
+                text-align: left !important;
+                align-self: flex-start !important;
+                width: 100%;
+            }}
+            /* Folder layout: "Quotation #" / title is h2.o_folder_title inside header flex after SVGs (reads right) */
+            .o_weasy_running_header .o_folder_adaptative_shape.d-flex {{
+                flex-wrap: wrap !important;
+                justify-content: flex-start !important;
+                align-items: flex-start !important;
+            }}
+            .o_weasy_running_header h2.o_folder_title {{
+                text-align: left !important;
+                order: -1 !important;
+                margin-right: auto !important;
+            }}
             /* Match Odoo report inner gutters (see web report.scss $o-default-report-margins).
                Zero padding flushed Myanmar/Latin glyphs against the page box and WeasyPrint
                clipped ascenders and table edge text; restore side inset + top breathing room. */
@@ -309,6 +388,15 @@ class IrActionsReport(models.Model):
             }}
             body.o_body_pdf td, body.o_body_pdf th {{
                 overflow: visible !important;
+            }}
+            /* Keep SO line table borders visible on every page fragment */
+            body.o_body_pdf .o_main_table {{
+                border: 0.25mm solid #9a9a9a !important;
+                border-collapse: collapse !important;
+            }}
+            body.o_body_pdf .o_main_table th,
+            body.o_body_pdf .o_main_table td {{
+                border: 0.25mm solid #9a9a9a !important;
             }}
             body.o_body_pdf, body.o_body_pdf table {{
                 line-height: 1.55 !important;

@@ -1,0 +1,21 @@
+# Python cache / compiled files
+__pycache__/
+*.pyc
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+
+# Odoo / misc local files
+.coverage
+coverage.xml
+.pytest_cache/
+

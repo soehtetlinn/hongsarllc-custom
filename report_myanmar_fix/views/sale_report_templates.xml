@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_myanmar_fix" inherit_id="sale.report_saleorder_document">
+        <!-- Customer block: also show phone number -->
+        <xpath expr="//t[@t-set='address']/div[@t-field='doc.partner_id']" position="attributes">
+            <attribute name="t-options">{'widget': 'contact', 'fields': ['address', 'name', 'phone'], 'no_marker': True, 'phone_icons': True}</attribute>
+        </xpath>
+
+        <!-- Sale order lines: force packaging fields to appear as dedicated columns -->
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th name="th_no" class="text-center">No.</th>
+        </xpath>
+        <xpath expr="//td[@name='td_name']" position="before">
+            <td name="td_no" class="text-center">
+                <span t-out="line_index + 1"/>
+            </td>
+        </xpath>
+        <xpath expr="//th[@name='th_quantity']" position="after">
+            <th name="th_packaging_qty" class="text-end">Pkg.Qty</th>
+            <th name="th_packaging" class="text-start">Pkg</th>
+        </xpath>
+        <xpath expr="//td[@name='td_quantity']/span[@t-if='line.product_packaging_id']" position="replace"/>
+        <xpath expr="//td[@name='td_quantity']" position="after">
+            <td name="td_packaging_qty" class="text-end">
+                <span t-if="line.product_packaging_qty" t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
+                <span t-else="">-</span>
+            </td>
+            <td name="td_packaging" class="text-start">
+                <span t-if="line.product_packaging_id" t-field="line.product_packaging_id"/>
+                <span t-else="">-</span>
+            </td>
+        </xpath>
+        <xpath expr="//th[@name='th_taxes']" position="replace"/>
+        <xpath expr="//td[@name='td_taxes']" position="replace"/>
+        <!-- Repeat SO table header on each new page -->
+        <xpath expr="//table[contains(@class, 'o_main_table')]/thead" position="attributes">
+            <attribute name="style">display: table-header-group;</attribute>
+        </xpath>
+        <!-- Avoid splitting one product line row between pages + keep visible row border -->
+        <xpath expr="//tbody[contains(@class, 'sale_tbody')]//tr[.//td[@name='td_name']]" position="attributes">
+            <attribute name="style">page-break-inside: avoid; break-inside: avoid; border-bottom: 1px solid #9a9a9a;</attribute>
+        </xpath>
+        <!-- Prevent layout break: keep wrapping rules on description cells (no table-layout fixed) -->
+        <xpath expr="//th[@name='th_description']" position="attributes">
+            <attribute name="style">width: 36%; white-space: normal;</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_no']" position="attributes">
+            <attribute name="style">width: 6%;</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_name']" position="attributes">
+            <attribute name="style">white-space: normal; word-break: break-word; overflow-wrap: anywhere;</attribute>
+        </xpath>
+        <!-- If a note line comes AFTER a product line, show it above that product line (and hide the standalone note row) -->
+        <xpath expr="//td[@name='td_name']/span[@t-field='line.name']" position="before">
+            <t t-if="not line_last and lines_to_report[line_index+1].display_type == 'line_note'">
+                <div class="fst-italic o_line_note" style="margin-bottom: 1mm;">
+                    <span t-field="lines_to_report[line_index+1].name"/>
+                </div>
+            </t>
+        </xpath>
+        <xpath expr="//td[@name='td_note_line']" position="attributes">
+            <attribute name="t-if">not (line_index and (not lines_to_report[line_index-1].display_type) and lines_to_report[line_index-1].product_type != 'combo')</attribute>
+            <attribute name="style">border-bottom: 1px solid #9a9a9a;</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_quantity']" position="attributes">
+            <attribute name="style">width: 11%;</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_quantity']" position="replace">
+            <th name="th_quantity" class="text-end text-nowrap" style="width: 11%;">Qty</th>
+        </xpath>
+        <xpath expr="//th[@name='th_packaging_qty']" position="attributes">
+            <attribute name="style">width: 10%;</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_packaging']" position="attributes">
+            <attribute name="style">width: 13%; white-space: normal;</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="style">width: 12%;</attribute>
+        </xpath>
+        <!-- Better visual ending before totals + cleaner totals placement -->
+        <xpath expr="//table[contains(@class, 'o_main_table')]" position="attributes">
+            <attribute name="style">border-bottom: 1px solid #9a9a9a; margin-bottom: 0; border-collapse: collapse;</attribute>
+        </xpath>
+        <xpath expr="//div[@id='total']" position="attributes">
+            <attribute name="class">row mt-n3</attribute>
+            <attribute name="style">page-break-inside: avoid; break-inside: avoid;</attribute>
+        </xpath>
+    </template>
+</odoo>
