@@ -10,6 +10,24 @@
         .article h2 * {
           color: #000000 !important;
         }
+        table.o_main_table th[name='th_priceunit'],
+        table.o_main_table td[name='td_priceunit'] {
+          width: 52px !important;
+          max-width: 52px !important;
+          min-width: 52px !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+          padding-left: 2px !important;
+          padding-right: 2px !important;
+          font-size: 0.9em;
+        }
+        table.o_main_table td[name='td_priceunit'] > span {
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       </style>
     </xpath>
 
@@ -17,7 +35,7 @@
     <xpath expr="//th[@name='th_description']" position="before">
       <th name="th_no" class="text-center">No.</th>
     </xpath>
-    <xpath expr="//td[@name='td_name']" position="before">
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_name']" position="before">
       <td name="td_no" class="text-center">
         <span t-out="line_index + 1"/>
       </td>
@@ -27,7 +45,7 @@
     <xpath expr="//th[@name='th_description']" position="after">
       <th name="th_other_name" class="text-start">Other Name</th>
     </xpath>
-    <xpath expr="//td[@name='td_name']" position="after">
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_name']" position="after">
       <td name="td_other_name" class="text-start">
         <span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/>
       </td>
@@ -37,17 +55,25 @@
     <xpath expr="//th[@name='th_quantity']" position="after">
       <th name="th_packaging_qty" class="text-end">Pkg Qty</th>
     </xpath>
-    <xpath expr="//td[@name='td_quantity']/span[@t-if='line.product_packaging_id']" position="replace"/>
-    <xpath expr="//td[@name='td_quantity']" position="after">
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_quantity']/span[@t-if='line.product_packaging_id']" position="replace"/>
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_quantity']" position="after">
       <td name="td_packaging_qty" class="text-end">
         <span t-if="line.product_packaging_qty" t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
         <span t-else="">-</span>
       </td>
     </xpath>
 
+    <!-- Narrow unit price column (drop Bootstrap text-nowrap that expands the column) -->
+    <xpath expr="//th[@name='th_priceunit']" position="replace">
+      <th name="th_priceunit" class="text-end o_col_priceunit">Price</th>
+    </xpath>
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_priceunit']" position="attributes">
+      <attribute name="class">text-end o_col_priceunit</attribute>
+    </xpath>
+
     <!-- Remove Taxes column on line items -->
     <xpath expr="//th[@name='th_taxes']" position="replace"/>
-    <xpath expr="//td[@name='td_taxes']" position="replace"/>
+    <xpath expr="//tbody[@class='sale_tbody']//td[@name='td_taxes']" position="replace"/>
 
     <!-- Footer: subtotal + total only (no tax breakdown rows) -->
     <xpath expr="//t[@t-call='sale.document_tax_totals']" position="replace">

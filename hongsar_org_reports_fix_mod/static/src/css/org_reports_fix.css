@@ -49,3 +49,24 @@ h5,
 h6 {
     font-weight: bold;
 }
+
+/* Sale order lines: narrow unit price, clip long amounts */
+table.o_main_table th[name='th_priceunit'],
+table.o_main_table td[name='td_priceunit'] {
+    width: 52px !important;
+    max-width: 52px !important;
+    min-width: 52px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    font-size: 0.9em;
+}
+
+table.o_main_table td[name='td_priceunit'] > span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
