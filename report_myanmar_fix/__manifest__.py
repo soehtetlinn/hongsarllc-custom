@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Report Myanmar Font Fix',
-    'version': '18.0.2.0.0',
+    'version': '18.0.2.0.9',
     'category': 'Hidden',
     'summary': 'Fix Myanmar/Burmese Unicode text rendering in PDF reports',
     'description': """
@@ -31,10 +31,11 @@ Usage:
 Simply install this module. It automatically fixes all PDF reports containing Myanmar text.
     """,
     'author': 'Custom',
-    'depends': ['base', 'web', 'sale', 'account'],
+    'depends': ['base', 'web', 'sale', 'account', 'hongsar_internal_mod'],
     'data': [
         'views/report_templates.xml',
         'views/sale_report_templates.xml',
+        'views/account_invoice_templates.xml',
         'views/account_invoice_report_action.xml',
     ],
     'external_dependencies': {

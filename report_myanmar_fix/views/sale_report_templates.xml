@@ -1,9 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_saleorder_document_myanmar_fix" inherit_id="sale.report_saleorder_document">
-        <!-- Customer block: also show phone number -->
-        <xpath expr="//t[@t-set='address']/div[@t-field='doc.partner_id']" position="attributes">
-            <attribute name="t-options">{'widget': 'contact', 'fields': ['address', 'name', 'phone'], 'no_marker': True, 'phone_icons': True}</attribute>
+        <!-- Disable external layout title rendering; we inject our own title below -->
+        <xpath expr="//t[@t-set='layout_document_title']" position="replace">
+            <t t-set="layout_document_title"></t>
+        </xpath>
+        <!-- Hide clipped default title and render a new aligned title -->
+        <xpath expr="//div[contains(@class, 'oe_structure')][1]" position="before">
+            <style>
+                .article > h2:first-of-type {
+                    display: none !important;
+                }
+            </style>
+        </xpath>
+        <xpath expr="//div[@id='informations']" position="before">
+            <h2 style="display:block; width:100%; text-align:left; margin-left:4mm; margin-top:0; margin-bottom:1mm;">
+                <span t-if="is_proforma">Pro-Forma Invoice # </span>
+                <span t-elif="doc.state in ['draft','sent']">Quotation # </span>
+                <span t-else="">Order # </span>
+                <span t-field="doc.name"/>
+            </h2>
+        </xpath>
+        <!-- Customer beside order date in #informations (not separate address block) -->
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address" t-value="False"/>
+        </xpath>
+        <xpath expr="//div[@id='informations']/div[@t-if='doc.user_id.name']" position="replace">
+            <div t-if="doc.user_id.name" class="col" name="informations_salesperson">
+                <strong>Salesperson</strong>
+                <div t-field="doc.user_id"/>
+            </div>
+        </xpath>
+        <xpath expr="//div[@name='informations_date']" position="after">
+            <div class="col" name="informations_customer">
+                <strong>Customer</strong>
+                <div t-field="doc.partner_id" t-options="{'widget': 'contact', 'fields': ['address', 'name', 'phone'], 'no_marker': True, 'phone_icons': True}"/>
+                <p t-if="doc.partner_id.vat" class="mb-0">
+                    <t t-if="doc.company_id.account_fiscal_country_id.vat_label" t-out="doc.company_id.account_fiscal_country_id.vat_label"/>
+                    <t t-else="">Tax ID</t>: <span t-field="doc.partner_id.vat"/>
+                </p>
+            </div>
+        </xpath>
+
+        <!-- Product (Other Name) column -->
+        <xpath expr="//th[@name='th_description']" position="after">
+            <th name="th_other_name" class="text-start">Other Name</th>
+        </xpath>
+        <xpath expr="//td[@name='td_name']" position="after">
+            <td name="td_other_name" class="text-start">
+                <span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/>
+            </td>
         </xpath>
 
         <!-- Sale order lines: force packaging fields to appear as dedicated columns -->
@@ -38,16 +84,22 @@
         </xpath>
         <!-- Avoid splitting one product line row between pages + keep visible row border -->
         <xpath expr="//tbody[contains(@class, 'sale_tbody')]//tr[.//td[@name='td_name']]" position="attributes">
-            <attribute name="style">page-break-inside: avoid; break-inside: avoid; border-bottom: 1px solid #9a9a9a;</attribute>
+            <attribute name="style">page-break-inside: auto; break-inside: auto; border-bottom: 1px solid #222;</attribute>
         </xpath>
         <!-- Prevent layout break: keep wrapping rules on description cells (no table-layout fixed) -->
         <xpath expr="//th[@name='th_description']" position="attributes">
-            <attribute name="style">width: 36%; white-space: normal;</attribute>
+            <attribute name="style">width: 28%; white-space: normal;</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_other_name']" position="attributes">
+            <attribute name="style">width: 12%; white-space: normal;</attribute>
         </xpath>
         <xpath expr="//th[@name='th_no']" position="attributes">
             <attribute name="style">width: 6%;</attribute>
         </xpath>
         <xpath expr="//td[@name='td_name']" position="attributes">
+            <attribute name="style">white-space: normal; word-break: break-word; overflow-wrap: anywhere;</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_other_name']" position="attributes">
             <attribute name="style">white-space: normal; word-break: break-word; overflow-wrap: anywhere;</attribute>
         </xpath>
         <!-- If a note line comes AFTER a product line, show it above that product line (and hide the standalone note row) -->
@@ -60,8 +112,10 @@
         </xpath>
         <xpath expr="//td[@name='td_note_line']" position="attributes">
             <attribute name="t-if">not (line_index and (not lines_to_report[line_index-1].display_type) and lines_to_report[line_index-1].product_type != 'combo')</attribute>
-            <attribute name="style">border-bottom: 1px solid #9a9a9a;</attribute>
+            <attribute name="style">border-bottom: 1px solid #222;</attribute>
         </xpath>
+        <!-- Remove section subtotal row from SO lines table (prevents subtotal appearing with notes) -->
+        <xpath expr="//tr[contains(@class, 'is-subtotal')]" position="replace"/>
         <xpath expr="//th[@name='th_quantity']" position="attributes">
             <attribute name="style">width: 11%;</attribute>
         </xpath>
@@ -79,10 +133,11 @@
         </xpath>
         <!-- Better visual ending before totals + cleaner totals placement -->
         <xpath expr="//table[contains(@class, 'o_main_table')]" position="attributes">
-            <attribute name="style">border-bottom: 1px solid #9a9a9a; margin-bottom: 0; border-collapse: collapse;</attribute>
+            <attribute name="class">o_has_total_table table o_main_table sale_main_table table-borderless</attribute>
+            <attribute name="style">border-bottom: 1px solid #111; margin-bottom: 0; border-collapse: separate; border-spacing: 0;</attribute>
         </xpath>
         <xpath expr="//div[@id='total']" position="attributes">
-            <attribute name="class">row mt-n3</attribute>
+            <attribute name="class">row mt-2</attribute>
             <attribute name="style">page-break-inside: avoid; break-inside: avoid;</attribute>
         </xpath>
     </template>

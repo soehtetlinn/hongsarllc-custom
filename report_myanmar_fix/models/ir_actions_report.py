@@ -21,6 +21,9 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
+# Overall PDF body font size (px). Reduced ~2px below typical Odoo report (~13px).
+REPORT_FONT_SIZE_PX = 11
+
 # Myanmar script Unicode range (U+1000 - U+109F) plus extensions
 _MYANMAR_PATTERN = re.compile(r'[\u1000-\u109F\uAA60-\uAA7F\uA9E0-\uA9FF]')
 
@@ -159,12 +162,12 @@ class IrActionsReport(models.Model):
         ml = float(paperformat_id.margin_left if paperformat_id else 7)
         mr = float(paperformat_id.margin_right if paperformat_id else 7)
         mlr = max(ml, mr)
-        # Running headers/footers paint in @page margin boxes; a bit more room avoids clipping
-        # (especially with Myanmar ascenders / Bootstrap grid overflow).
+        # Running header/footer paint in @page margin boxes (not duplicated in body).
         if has_running_header:
-            mt += 6.0
+            # Cap Odoo's large default top margin; header height ~22–28mm is enough.
+            mt = min(mt, 26.0) + 2.0
         if has_running_footer:
-            mb += 4.0
+            mb = min(mb, 18.0) + 2.0
         return mt, mb, mlr
 
     def _weasyprint_page_size_css(self, paperformat_id, landscape):
@@ -194,9 +197,9 @@ class IrActionsReport(models.Model):
             page_extra.append('''
             @top-center {
                 content: element(weasy-doc-header);
-                vertical-align: bottom;
+                vertical-align: top;
                 text-align: left;
-                padding: 2mm 6mm 6mm 6mm;
+                padding: 3px 6mm 1mm 6mm;
                 margin: 0;
                 width: 100%;
             }''')
@@ -226,7 +229,7 @@ class IrActionsReport(models.Model):
                 width: 100%;
                 box-sizing: border-box;
                 overflow: visible !important;
-                line-height: 1.55 !important;
+                line-height: 1.3 !important;
             }
             ''')
         if has_running_footer:
@@ -251,9 +254,13 @@ class IrActionsReport(models.Model):
                 overflow: visible !important;
             }}
             /* Same horizontal inset as body + room for tall glyphs */
-            .o_weasy_running_header .o_weasy_running_inset,
+            .o_weasy_running_header .o_weasy_running_inset {{
+                padding: 5px 11mm 0.5mm 11mm;
+                box-sizing: border-box !important;
+                overflow: visible !important;
+            }}
             .o_weasy_running_footer .o_weasy_running_inset {{
-                padding: 3mm 11mm 1mm 11mm;
+                padding: 0.5mm 11mm 0.5mm 11mm;
                 box-sizing: border-box !important;
                 overflow: visible !important;
             }}
@@ -328,6 +335,123 @@ class IrActionsReport(models.Model):
             }}
             body.o_body_pdf .address.row {{
                 justify-content: flex-start !important;
+                margin-top: 0 !important;
+                margin-bottom: 2mm !important;
+                padding-bottom: 0 !important;
+            }}
+            body.o_body_pdf .address.row div[name="address"],
+            body.o_body_pdf .address.row div[name="information_block"] {{
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+                line-height: 1.25 !important;
+            }}
+            body.o_body_pdf .address.row address,
+            body.o_body_pdf .address.row address div,
+            body.o_body_pdf .address.row address span {{
+                margin: 0 !important;
+                padding: 0 !important;
+                line-height: 1.25 !important;
+            }}
+            /* Compact company letterhead (logo + company address) */
+            .o_weasy_running_header .mb8,
+            .o_weasy_running_header .mb4,
+            .o_weasy_running_header .mb-4 {{
+                margin-bottom: 0 !important;
+            }}
+            .o_weasy_running_header .header {{
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }}
+            .o_weasy_running_header .header .row {{
+                margin-bottom: 0 !important;
+                gap: 0.25rem !important;
+            }}
+            .o_weasy_running_header [name="company_address"],
+            .o_weasy_running_header [name="company_address"] ul,
+            .o_weasy_running_header [name="company_address"] li,
+            .o_weasy_running_header [name="company_address"] span,
+            .o_weasy_running_header [name="company_address"] div {{
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                line-height: 1.25 !important;
+            }}
+            .o_weasy_running_header address {{
+                margin: 0 !important;
+                line-height: 1.25 !important;
+            }}
+            .o_weasy_running_header .o_company_logo_big {{
+                margin-bottom: 0 !important;
+            }}
+            body.o_body_pdf #informations {{
+                margin-bottom: 2mm !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                align-items: flex-start !important;
+                gap: 0 2mm !important;
+            }}
+            /* Order date, customer, salesperson: one row, equal width (33% each) */
+            body.o_body_pdf #informations [name="informations_date"] {{
+                order: 2 !important;
+            }}
+            body.o_body_pdf #informations [name="informations_customer"] {{
+                order: 3 !important;
+            }}
+            body.o_body_pdf #informations [name="informations_salesperson"] {{
+                order: 4 !important;
+            }}
+            body.o_body_pdf #informations [name="informations_date"],
+            body.o_body_pdf #informations [name="informations_customer"],
+            body.o_body_pdf #informations [name="informations_salesperson"] {{
+                flex: 1 1 33.33% !important;
+                width: 33.33% !important;
+                max-width: 33.33% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+                margin-bottom: 0 !important;
+                padding-right: 2mm !important;
+                vertical-align: top !important;
+                line-height: 1.25 !important;
+            }}
+            body.o_body_pdf #informations [name="informations_customer"] address,
+            body.o_body_pdf #informations [name="informations_customer"] div,
+            body.o_body_pdf #informations [name="informations_customer"] p {{
+                margin: 0 !important;
+                padding: 0 !important;
+                line-height: 1.25 !important;
+            }}
+            /* Reference / expiration on their own full-width rows */
+            body.o_body_pdf #informations [name="informations_reference"] {{
+                order: 1 !important;
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }}
+            body.o_body_pdf #informations [name="expiration_date"] {{
+                order: 5 !important;
+                flex: 1 1 100% !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }}
+            /* Customer moved into #informations; hide duplicate top address row on invoices */
+            body.o_body_pdf .invoice_main > .row:first-child {{
+                display: none !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }}
+            body.o_body_pdf .article > .oe_structure:empty,
+            body.o_body_pdf .oe_structure:empty {{
+                display: none !important;
+                height: 0 !important;
+                min-height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }}
+            body.o_body_pdf .article h2 {{
+                margin-top: 1mm !important;
+                margin-bottom: 1mm !important;
             }}
             /* Bubble (and similar): title was flexed to the opposite side of the customer block */
             body.o_body_pdf .article > div.d-flex.justify-content-between.align-items-end {{
@@ -366,13 +490,14 @@ class IrActionsReport(models.Model):
                 box-sizing: border-box !important;
                 padding-left: 11mm !important;
                 padding-right: 11mm !important;
-                padding-top: 3mm !important;
+                padding-top: 0 !important;
             }}
             body.o_body_pdf.o_css_margins.container {{
                 padding-top: 0 !important;
             }}
             body.o_body_pdf.o_css_margins .header {{
-                padding-top: 11mm !important;
+                padding-top: 0 !important;
+                margin-top: 0 !important;
             }}
             body.o_body_pdf.o_css_margins .footer > .o_footer_content {{
                 padding-bottom: 11mm !important;
@@ -390,16 +515,154 @@ class IrActionsReport(models.Model):
                 overflow: visible !important;
             }}
             /* Keep SO line table borders visible on every page fragment */
-            body.o_body_pdf .o_main_table {{
-                border: 0.25mm solid #9a9a9a !important;
-                border-collapse: collapse !important;
+            body.o_body_pdf .sale_main_table {{
+                border-left: 0.30mm solid #111 !important;
+                border-right: 0.30mm solid #111 !important;
+                border-bottom: 0.30mm solid #111 !important;
+                border-top: 0.30mm solid #111 !important;
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
             }}
-            body.o_body_pdf .o_main_table th,
-            body.o_body_pdf .o_main_table td {{
-                border: 0.25mm solid #9a9a9a !important;
+            body.o_body_pdf .sale_main_table th,
+            body.o_body_pdf .sale_main_table td {{
+                border-right: 0.30mm solid #111 !important;
+                border-bottom: 0.30mm solid #111 !important;
+                border-top: 0 !important;
+            }}
+            body.o_body_pdf .sale_main_table th:last-child,
+            body.o_body_pdf .sale_main_table td:last-child {{
+                border-right: 0 !important;
+            }}
+            body.o_body_pdf .sale_main_table thead th:first-child {{
+                border-top-left-radius: 7px !important;
+            }}
+            body.o_body_pdf .sale_main_table thead th:last-child {{
+                border-top-right-radius: 7px !important;
+            }}
+            /* Invoice line table should use the same bordered theme as SO */
+            body.o_body_pdf .invoice_main_table {{
+                border-left: 0.30mm solid #111 !important;
+                border-right: 0.30mm solid #111 !important;
+                border-bottom: 0.30mm solid #111 !important;
+                border-top: 0.30mm solid #111 !important;
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
+                table-layout: auto !important;
+            }}
+            body.o_body_pdf .invoice_main_table th,
+            body.o_body_pdf .invoice_main_table td {{
+                border-right: 0.30mm solid #111 !important;
+                border-bottom: 0.30mm solid #111 !important;
+                border-top: 0 !important;
+            }}
+            body.o_body_pdf .invoice_main_table th:last-child,
+            body.o_body_pdf .invoice_main_table td:last-child {{
+                border-right: 0 !important;
+            }}
+            body.o_body_pdf .invoice_main_table thead th:first-child {{
+                border-top-left-radius: 7px !important;
+            }}
+            body.o_body_pdf .invoice_main_table thead th:last-child {{
+                border-top-right-radius: 7px !important;
+            }}
+            /* Prevent left-edge clipping in first column for both SO and Invoice tables */
+            body.o_body_pdf .sale_main_table th:first-child,
+            body.o_body_pdf .sale_main_table td:first-child,
+            body.o_body_pdf .invoice_main_table th:first-child,
+            body.o_body_pdf .invoice_main_table td:first-child {{
+                padding-left: 2mm !important;
+            }}
+            /* Fix first-letter clipping on document titles (e.g., Quotation/Invoice) */
+            body.o_body_pdf .article h2,
+            body.o_body_pdf .article .o_folder_title,
+            body.o_body_pdf .invoice_main .page h2 {{
+                padding-left: 2mm !important;
+                margin-left: 0 !important;
+                overflow: visible !important;
+                text-indent: 0 !important;
+            }}
+            /* Footer line above contact info should not appear */
+            .o_weasy_running_footer .o_footer_content,
+            .o_weasy_running_footer .border-top {{
+                border-top: 0 !important;
+            }}
+            /* WeasyPrint does not fill span.page/topage by JS; use CSS counters */
+            .o_weasy_running_footer .page::before {{
+                content: counter(page);
+            }}
+            .o_weasy_running_footer .topage::before {{
+                content: counter(pages);
+            }}
+            /* Keep totals block clean and detached from the line table */
+            body.o_body_pdf #total {{
+                margin-top: 2mm !important;
+            }}
+            body.o_body_pdf #total .o_total_table {{
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
+                border: 0.30mm solid #111 !important;
+                border-radius: 8px !important;
+                overflow: hidden !important;
+            }}
+            body.o_body_pdf #total .o_total_table tr:first-child td:first-child {{
+                border-top-left-radius: 8px !important;
+            }}
+            body.o_body_pdf #total .o_total_table tr:first-child td:last-child {{
+                border-top-right-radius: 8px !important;
+            }}
+            body.o_body_pdf #total .o_total_table tr:last-child td:first-child {{
+                border-bottom-left-radius: 8px !important;
+            }}
+            body.o_body_pdf #total .o_total_table tr:last-child td:last-child {{
+                border-bottom-right-radius: 8px !important;
             }}
             body.o_body_pdf, body.o_body_pdf table {{
                 line-height: 1.55 !important;
+            }}
+            /* Overall smaller report text (~3px below default) */
+            body.o_body_pdf,
+            body.o_body_pdf table,
+            body.o_body_pdf td,
+            body.o_body_pdf th,
+            body.o_body_pdf div,
+            body.o_body_pdf span,
+            body.o_body_pdf p,
+            body.o_body_pdf address,
+            body.o_body_pdf strong,
+            body.o_body_pdf b,
+            body.o_body_pdf i,
+            body.o_body_pdf em,
+            body.o_body_pdf small,
+            body.o_body_pdf .page,
+            body.o_body_pdf article,
+            body.o_body_pdf .o_report_layout,
+            .o_weasy_running_header,
+            .o_weasy_running_header table,
+            .o_weasy_running_header td,
+            .o_weasy_running_header th,
+            .o_weasy_running_header div,
+            .o_weasy_running_header span,
+            .o_weasy_running_header p,
+            .o_weasy_running_footer,
+            .o_weasy_running_footer table,
+            .o_weasy_running_footer td,
+            .o_weasy_running_footer th,
+            .o_weasy_running_footer div,
+            .o_weasy_running_footer span,
+            .o_weasy_running_footer p {{
+                font-size: {REPORT_FONT_SIZE_PX}px !important;
+            }}
+            body.o_body_pdf h1 {{
+                font-size: {REPORT_FONT_SIZE_PX + 6}px !important;
+            }}
+            body.o_body_pdf h2 {{
+                font-size: {REPORT_FONT_SIZE_PX + 2}px !important;
+            }}
+            body.o_body_pdf h3,
+            body.o_body_pdf h4,
+            body.o_body_pdf h5,
+            body.o_body_pdf h6 {{
+                font-size: {REPORT_FONT_SIZE_PX + 1}px !important;
             }}
             body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6,
             address, strong, b, i, em, small, .page, article,

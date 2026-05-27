@@ -1,0 +1,176 @@
+.hongsar-report-wrap {
+    font-family: "Noto Sans Myanmar", "Padauk", "Lato", "DejaVu Sans", "FreeSans", sans-serif;
+    color: #1a2233;
+    font-size: 11.5px;
+}
+
+.hongsar-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid #d6deeb;
+    background: #f8fbff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+}
+
+.company-left {
+    width: 30%;
+}
+
+.company-right {
+    width: 68%;
+    text-align: right;
+    line-height: 1.45;
+}
+
+.company-logo {
+    max-height: 70px;
+    max-width: 150px;
+    object-fit: contain;
+}
+
+.company-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 2px;
+    color: #111b2e;
+}
+
+.formal-report-page .doc-title {
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 6px 0 10px;
+    color: #11203f;
+}
+
+.meta-table,
+.party-table,
+.grid-table,
+.totals-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.section-card {
+    border: 1px solid #d6deeb;
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.meta-table td,
+.party-table td,
+.grid-table th,
+.grid-table td,
+.totals-table td {
+    border: 1px solid #dbe3f0;
+    padding: 7px 8px;
+    vertical-align: top;
+}
+
+.section-title {
+    margin: 10px 0 5px;
+    font-weight: 700;
+    color: #23375d;
+}
+
+.party-col {
+    width: 50%;
+}
+
+.modern-grid thead th {
+    background: #eef4ff;
+    font-weight: 700;
+    color: #1c2f52;
+    border-color: #cfdcf6;
+}
+
+.modern-grid tbody tr:nth-child(even) td {
+    background: #fafcff;
+}
+
+.col-no {
+    width: 6%;
+}
+
+.col-other {
+    width: 14%;
+}
+
+.col-qty,
+.col-pkgqty,
+.col-price,
+.col-amt {
+    width: 10%;
+}
+
+.col-pkg {
+    width: 11%;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-end {
+    text-align: right;
+}
+
+.totals-table {
+    width: 46%;
+    margin-left: auto;
+    margin-top: 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px #d6deeb inset;
+}
+
+.totals-table .grand-total td {
+    font-weight: 700;
+    background: #eaf1ff;
+    color: #14284d;
+}
+
+.payment-status {
+    margin-top: 10px;
+    border: 1px solid #ccd7ea;
+    border-radius: 8px;
+    background: #f8fbff;
+    padding: 7px 9px;
+}
+
+.signature-grid {
+    display: table;
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 8px 0;
+}
+
+.sign-box {
+    display: table-cell;
+    width: 33%;
+    height: 54px;
+    border: 1px dashed #8ea3c7;
+    border-radius: 8px;
+    text-align: center;
+    vertical-align: bottom;
+    color: #2a3d62;
+    font-weight: 600;
+    padding-bottom: 6px;
+    background: #fbfcff;
+}
+
+.hongsar-footer {
+    margin-top: 8px;
+    font-size: 10px;
+    color: #64748b;
+}
+
+.hongsar-footer .page-number {
+    text-align: right;
+}

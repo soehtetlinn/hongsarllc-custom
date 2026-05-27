@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <template id="report_saleorder_document_org_fix" inherit_id="sale.report_saleorder_document">
+
+    <!-- SO / Quotation number in black -->
+    <xpath expr="//div[@class='page']/div[@class='oe_structure'][1]" position="before">
+      <style>
+        .article h2,
+        .article h2 span,
+        .article h2 * {
+          color: #000000 !important;
+        }
+      </style>
+    </xpath>
+
+    <!-- No. (row counter) as first column -->
+    <xpath expr="//th[@name='th_description']" position="before">
+      <th name="th_no" class="text-center">No.</th>
+    </xpath>
+    <xpath expr="//td[@name='td_name']" position="before">
+      <td name="td_no" class="text-center">
+        <span t-out="line_index + 1"/>
+      </td>
+    </xpath>
+
+    <!-- Other Name (product alternative name) -->
+    <xpath expr="//th[@name='th_description']" position="after">
+      <th name="th_other_name" class="text-start">Other Name</th>
+    </xpath>
+    <xpath expr="//td[@name='td_name']" position="after">
+      <td name="td_other_name" class="text-start">
+        <span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/>
+      </td>
+    </xpath>
+
+    <!-- Pkg Qty column; remove inline packaging from Qty cell -->
+    <xpath expr="//th[@name='th_quantity']" position="after">
+      <th name="th_packaging_qty" class="text-end">Pkg Qty</th>
+    </xpath>
+    <xpath expr="//td[@name='td_quantity']/span[@t-if='line.product_packaging_id']" position="replace"/>
+    <xpath expr="//td[@name='td_quantity']" position="after">
+      <td name="td_packaging_qty" class="text-end">
+        <span t-if="line.product_packaging_qty" t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/>
+        <span t-else="">-</span>
+      </td>
+    </xpath>
+
+    <!-- Remove Taxes column on line items -->
+    <xpath expr="//th[@name='th_taxes']" position="replace"/>
+    <xpath expr="//td[@name='td_taxes']" position="replace"/>
+
+    <!-- Footer: subtotal + total only (no tax breakdown rows) -->
+    <xpath expr="//t[@t-call='sale.document_tax_totals']" position="replace">
+      <tr class="o_subtotal">
+        <td>Subtotal</td>
+        <td class="text-end">
+          <span t-field="doc.amount_untaxed"
+                t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+        </td>
+      </tr>
+      <tr class="o_total">
+        <td><strong>Total</strong></td>
+        <td class="text-end">
+          <strong t-field="doc.amount_total"
+                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+        </td>
+      </tr>
+    </xpath>
+
+  </template>
+</odoo>

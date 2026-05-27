@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="formal_external_layout">
+        <t t-set="company" t-value="company or (o and o.company_id)"/>
+        <style>
+            .hongsar-report-wrap {
+                font-family: "Noto Sans Myanmar", "Padauk", "Lato", "DejaVu Sans", "FreeSans", sans-serif;
+                color: #1a2233;
+                font-size: 13.4px;
+                font-weight: 500;
+            }
+            .hongsar-header {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                border: 1.6px solid #8eaee6;
+                background: linear-gradient(180deg, #f3f8ff 0%, #eef5ff 100%);
+                border-radius: 10px;
+                padding: 8px 12px;
+                margin-bottom: 8px;
+            }
+            .company-left { width: 18%; flex-shrink: 0; }
+            .company-center { width: 42%; line-height: 1.5; font-size: 13.2px; }
+            .customer-right {
+                width: 38%;
+                text-align: right;
+                line-height: 1.5;
+                font-size: 13.2px;
+                border-left: 1px solid #bdd0f2;
+                padding-left: 10px;
+            }
+            .customer-right .customer-label {
+                font-weight: 800;
+                color: #19396f;
+                margin-bottom: 4px;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+            .company-logo { max-height: 70px; max-width: 150px; object-fit: contain; }
+            .company-name { font-size: 20px; font-weight: 800; margin-bottom: 2px; color: #0f2350; }
+            .formal-report-page .doc-title {
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 1.4px;
+                margin: 4px 0 8px;
+                color: #0f2557;
+                font-size: 22px;
+                font-weight: 800;
+            }
+            .meta-table, .party-table, .grid-table, .totals-table { width: 100%; border-collapse: collapse; }
+            .section-card {
+                border: 1.3px solid #bdd0f2;
+                border-radius: 10px;
+                background: #ffffff;
+                overflow: hidden;
+                margin-bottom: 10px;
+            }
+            .meta-table td, .party-table td, .grid-table th, .grid-table td, .totals-table td {
+                border: 1px solid #c9d8f4;
+                padding: 8px 9px;
+                vertical-align: top;
+            }
+            .section-title {
+                margin: 9px 0 5px;
+                font-weight: 800;
+                color: #19396f;
+                font-size: 15px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .party-col { width: 50%; }
+            .modern-grid thead th {
+                background: #dfeaff;
+                font-weight: 800;
+                color: #152f5d;
+                border-color: #aac0ea;
+            }
+            .modern-grid tbody td { font-weight: 600; }
+            .modern-grid tbody tr:nth-child(even) td { background: #f6f9ff; }
+            .col-no { width: 6%; }
+            .col-other { width: 14%; }
+            .col-qty, .col-pkgqty, .col-price, .col-amt { width: 10%; }
+            .col-pkg { width: 11%; }
+            .text-center { text-align: center; }
+            .text-end { text-align: right; }
+            .totals-table {
+                width: 52%;
+                margin-left: auto;
+                margin-top: 10px;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 0 0 1.3px #b5caef inset;
+            }
+            .totals-table .grand-total td { font-weight: 800; background: #dfeaff; color: #102654; }
+            .payment-status {
+                margin-top: 10px;
+                border: 1.3px solid #b7caee;
+                border-radius: 8px;
+                background: #f1f6ff;
+                padding: 8px 10px;
+                font-weight: 700;
+            }
+            .hongsar-footer { margin-top: 5px; font-size: 11px; color: #4b5f86; font-weight: 600; }
+            .hongsar-footer .page-number { text-align: center; }
+
+            .hongsar-invoice-wrap {
+                font-family: "Noto Sans Myanmar", "Padauk", "Lato", "DejaVu Sans", "FreeSans", sans-serif;
+                font-size: 11px;
+                color: #263247;
+                border: 1px solid #d7deea;
+                padding: 8px;
+                background: #ffffff;
+            }
+            .inv-top-header {
+                display: grid;
+                grid-template-columns: 86px 1fr 1fr;
+                border: 1px solid #d8dde8;
+                background: #eef2f7;
+                align-items: start;
+            }
+            .inv-logo-col { padding: 4px; border-right: 1px solid #d8dde8; }
+            .inv-logo { max-height: 56px; max-width: 76px; object-fit: contain; }
+            .inv-company-col { padding: 4px 8px; line-height: 1.25; font-size: 9.8px; }
+            .inv-customer-col {
+                padding: 4px 8px;
+                line-height: 1.25;
+                font-size: 9.5px;
+                text-align: right;
+                border-left: 1px solid #d8dde8;
+            }
+            .inv-company-name { color: #b32323; font-size: 12px; font-weight: 800; }
+            .inv-strip {
+                text-align: center;
+                font-size: 9px;
+                padding: 2px 6px;
+                border: 1px solid #d8dde8;
+                border-top: 0;
+                font-weight: 700;
+            }
+            .inv-strip-green { background: #e7f6e7; color: #2f5f2f; }
+            .inv-strip-title {
+                background: #ece9fb;
+                color: #ca2222;
+                font-size: 13px;
+                letter-spacing: 0.7px;
+            }
+            .inv-meta-grid {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 3px;
+                margin-bottom: 4px;
+            }
+            .inv-meta-grid td {
+                border: 1px solid #d8dde8;
+                padding: 4px 6px;
+                vertical-align: top;
+                font-size: 9.5px;
+                line-height: 1.2;
+            }
+            .inv-meta-grid .info-col { width: 100%; }
+            .meta-label { font-weight: 800; color: #2a3552; }
+            .meta-value { font-weight: 700; }
+            .inv-lines-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 9px;
+            }
+            .inv-lines-table th,
+            .inv-lines-table td {
+                border: 1px solid #cfd7e6;
+                padding: 3px 4px;
+                line-height: 1.15;
+            }
+            .inv-lines-table thead th {
+                background: #d9e7ff;
+                color: #2b3f66;
+                font-weight: 800;
+                text-align: center;
+                white-space: nowrap;
+            }
+            .inv-lines-table tbody tr:nth-child(even) td { background: #f8fbff; }
+            .inv-lines-table .w-no { width: 3%; }
+            .inv-lines-table .w-code { width: 8%; }
+            .inv-lines-table .w-desc { width: 22%; }
+            .inv-lines-table .w-name { width: 24%; }
+            .inv-lines-table .w-case { width: 10%; }
+            .inv-lines-table .w-qty { width: 8%; }
+            .inv-lines-table .w-unit { width: 10%; }
+            .inv-lines-table .w-amt { width: 15%; }
+            .inv-lines-table tfoot .sum-label {
+                text-align: right;
+                font-weight: 800;
+                background: #ffe7cc;
+                color: #8e4f1a;
+            }
+            .inv-lines-table tfoot .sum-value {
+                text-align: right;
+                font-weight: 800;
+                background: #ffe1bf;
+                color: #7f4317;
+            }
+            .inv-status-box {
+                width: 150px;
+                margin: 12px auto 0;
+                text-align: center;
+                border: 2px solid #ef9d5c;
+                padding: 6px 8px;
+                font-size: 24px;
+                font-weight: 800;
+                color: #2e2a1f;
+                background: #fffdfa;
+            }
+        </style>
+        <div class="hongsar-report-wrap">
+            <div class="hongsar-header">
+                <div class="company-left">
+                    <img t-if="company and company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" class="company-logo"/>
+                </div>
+                <div class="company-center">
+                    <div class="company-name" t-out="company.name if company else ''"/>
+                    <div t-if="company and company.street" t-out="company.street"/>
+                    <div t-if="company and company.street2" t-out="company.street2"/>
+                    <div>
+                        <span t-if="company and company.city" t-out="company.city"/>
+                        <span t-if="company and company.state_id">, <span t-out="company.state_id.name"/></span>
+                        <span t-if="company and company.country_id">, <span t-out="company.country_id.name"/></span>
+                    </div>
+                    <div t-if="company and company.phone">Phone: <span t-out="company.phone"/></div>
+                    <div t-if="company and company.email">Email: <span t-out="company.email"/></div>
+                    <div t-if="company and company.vat">Tax ID: <span t-out="company.vat"/></div>
+                </div>
+                <div class="customer-right" t-if="o and o._name == 'sale.order' and o.partner_id">
+                    <div class="customer-label">Customer</div>
+                    <div class="company-name" t-out="o.partner_id.name"/>
+                    <div t-field="o.partner_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': True}"/>
+                    <div t-if="o.partner_id.phone">Phone: <span t-out="o.partner_id.phone"/></div>
+                </div>
+            </div>
+
+            <div class="hongsar-body">
+                <t t-out="0"/>
+            </div>
+
+            <div class="hongsar-footer">
+                <div class="page-number">Page <span class="page"/> / <span class="topage"/></div>
+            </div>
+        </div>
+    </template>
+</odoo>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_own_date" model="ir.ui.view">
+        <field name="name">sale.order.form.own.date</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='order_details']/field[@name='validity_date']" position="after">
+                <field name="own_date" readonly="state in ['sale', 'cancel']"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Core sale views hardcode product domains; those override model field domains. -->
+    <record id="view_order_form_product_visible_company" model="ir.ui.view">
+        <field name="name">sale.order.form.product.visible.company</field>
+        <field name="model">sale.order</field>
+        <field name="priority">1000</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath
+                expr="//field[@name='order_line']/form//field[@name='product_id'][@widget='many2one_barcode']"
+                position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), '|', ('product_tmpl_id.x_studio_visible_company', '=', False), ('product_tmpl_id.x_studio_visible_company', '=', parent.company_id)]</attribute>
+                <attribute name="context">{
+                    'partner_id': parent.partner_id,
+                    'quantity': product_uom_qty,
+                    'pricelist': parent.pricelist_id,
+                    'uom': product_uom,
+                    'company_id': parent.company_id,
+                    'hongsar_order_by_internal_ref': 1,
+                }</attribute>
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+            <xpath
+                expr="//field[@name='order_line']/list//field[@name='product_id'][@widget='sol_product_many2one']"
+                position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), '|', ('product_tmpl_id.x_studio_visible_company', '=', False), ('product_tmpl_id.x_studio_visible_company', '=', parent.company_id)]</attribute>
+                <attribute name="context">{
+                    'partner_id': parent.partner_id,
+                    'quantity': product_uom_qty,
+                    'pricelist': parent.pricelist_id,
+                    'uom': product_uom,
+                    'company_id': parent.company_id,
+                    'default_lst_price': price_unit,
+                    'hongsar_order_by_internal_ref': 1,
+                }</attribute>
+                <attribute name="options">{'no_open': True, 'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+            <xpath
+                expr="//field[@name='order_line']/list//field[@name='product_template_id'][@widget='sol_product_many2one']"
+                position="attributes">
+                <attribute name="domain">[('sale_ok', '=', True), '|', ('x_studio_visible_company', '=', False), ('x_studio_visible_company', '=', parent.company_id)]</attribute>
+                <attribute name="context">{
+                    'partner_id': parent.partner_id,
+                    'quantity': product_uom_qty,
+                    'pricelist': parent.pricelist_id,
+                    'uom': product_uom,
+                    'company_id': parent.company_id,
+                    'default_list_price': price_unit,
+                    'hongsar_order_by_internal_ref': 1,
+                }</attribute>
+                <attribute name="options">{'no_open': True, 'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+            <xpath
+                expr="//field[@name='order_line']/kanban//field[@name='product_id'][@widget='image']"
+                position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+            <xpath
+                expr="//field[@name='order_line']/kanban//field[@name='product_id'][@class='fw-bold']"
+                position="attributes">
+                <attribute name="options">{'no_create': True, 'no_create_edit': True}</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

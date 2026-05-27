@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_hongsar">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="hongsar-invoice-wrap">
+                    <div class="inv-top-header">
+                        <div class="inv-logo-col">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" alt="Logo" class="inv-logo"/>
+                        </div>
+                        <div class="inv-company-col">
+                            <div class="inv-company-name" t-out="o.company_id.name"/>
+                            <div t-if="o.company_id.street" t-out="o.company_id.street"/>
+                            <div t-if="o.company_id.street2" t-out="o.company_id.street2"/>
+                            <div>
+                                <span t-if="o.company_id.city" t-out="o.company_id.city"/>
+                                <span t-if="o.company_id.state_id">, <span t-out="o.company_id.state_id.name"/></span>
+                                <span t-if="o.company_id.zip"> <span t-out="o.company_id.zip"/></span>
+                                <span t-if="o.company_id.country_id">, <span t-out="o.company_id.country_id.name"/></span>
+                            </div>
+                        </div>
+                        <div class="inv-customer-col">
+                            <div class="meta-label">Bill To</div>
+                            <div class="meta-value" t-out="o.partner_id.name or '-'"/>
+                            <div t-field="o.partner_id" t-options="{'widget': 'contact', 'fields': ['address'], 'no_marker': True}"/>
+                            <div t-if="o.partner_id.phone">(<span t-out="o.partner_id.phone"/>)</div>
+                        </div>
+                    </div>
+
+                    <div class="inv-strip inv-strip-green">
+                        Phone: <span t-out="o.company_id.phone or '-'"/>,
+                        <span t-if="o.company_id.mobile" t-out="o.company_id.mobile"/>
+                    </div>
+                    <div class="inv-strip inv-strip-title">
+                        <t t-if="o.move_type == 'out_refund'">CREDIT NOTE</t>
+                        <t t-else="">INVOICE</t>
+                    </div>
+
+                    <table class="inv-meta-grid">
+                        <tr>
+                            <td class="info-col">
+                                <div><span class="meta-label">Invoice No:</span> <span class="meta-value" t-field="o.name"/></div>
+                                <div><span class="meta-label">Date:</span> <span class="meta-value" t-field="o.invoice_date"/></div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table class="inv-lines-table">
+                        <thead>
+                            <tr>
+                                <th class="w-no">No.</th>
+                                <th class="w-code">Code</th>
+                                <th class="w-desc">Description</th>
+                                <th class="w-name">Product/Another Name</th>
+                                <th class="w-case">Case</th>
+                                <th class="w-qty">Qty</th>
+                                <th class="w-unit">Unit Price</th>
+                                <th class="w-amt">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="lines" t-value="o.invoice_line_ids.filtered(lambda l: not l.display_type)"/>
+                            <tr t-foreach="lines" t-as="line">
+                                <td class="text-center"><span t-out="line_index + 1"/></td>
+                                <td class="text-center"><span t-out="line.product_id.default_code or '-'"/></td>
+                                <td><span t-out="(line.name or '').split('\n')[0]"/></td>
+                                <td><span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/></td>
+                                <td class="text-center"><span t-out="line.product_packaging_id and line.product_packaging_id.name or '-'"/></td>
+                                <td class="text-end"><span t-field="line.quantity"/></td>
+                                <td class="text-end"><span t-field="line.price_unit"/></td>
+                                <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7" class="sum-label">Total</td>
+                                <td class="sum-value"><span t-field="o.amount_untaxed"/></td>
+                            </tr>
+                            <tr>
+                                <td colspan="7" class="sum-label">Balance</td>
+                                <td class="sum-value"><span t-field="o.amount_residual"/></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="inv-status-box">
+                        <span t-if="o.payment_state == 'paid'">Paid</span>
+                        <span t-elif="o.payment_state == 'partial'">Partially Paid</span>
+                        <span t-elif="o.payment_state == 'in_payment'">In Payment</span>
+                        <span t-else="">Not Paid</span>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

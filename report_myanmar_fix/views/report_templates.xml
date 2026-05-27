@@ -14,9 +14,15 @@
             <style>
                 /* Myanmar Unicode font support for PDF reports */
                 /* WeasyPrint will use these fonts for proper rendering */
-                body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6 {
+                body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6,
+                address, strong, b, i, em, small, .page, article,
+                .o_report_layout, .article {
                     font-family: 'Noto Sans Myanmar', 'Padauk', 'Lato', 'Lucida Grande', Helvetica, Verdana, Arial, sans-serif !important;
+                    font-size: 11px !important;
                 }
+                h1 { font-size: 17px !important; }
+                h2 { font-size: 13px !important; }
+                h3, h4, h5, h6 { font-size: 12px !important; }
             </style>
         </xpath>
     </template>

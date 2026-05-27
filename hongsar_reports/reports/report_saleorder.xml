@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_hongsar">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="hongsar_reports.formal_external_layout">
+                    <div class="formal-report-page">
+                        <h2 class="doc-title">
+                            <t t-if="o.state in ['draft', 'sent']">Quotation</t>
+                            <t t-else="">Sales Order</t>
+                        </h2>
+
+                        <div class="section-card">
+                            <table class="meta-table">
+                                <tr>
+                                    <td><strong>Document No:</strong> <span t-field="o.name"/></td>
+                                    <td><strong>Date:</strong> <span t-field="o.date_order"/></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Customer Ref:</strong> <span t-out="o.client_order_ref or '-'"/></td>
+                                    <td><strong>Salesperson:</strong> <span t-out="o.user_id.name or '-'"/></td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="section-title">Customer Information</div>
+                        <div class="section-card">
+                            <table class="party-table">
+                                <tr>
+                                    <td colspan="2">
+                                        <div><strong>Email:</strong> <span t-out="o.partner_id.email or '-'"/></div>
+                                        <div><strong>Tax ID:</strong> <span t-out="o.partner_id.vat or '-'"/></div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <div class="section-title">Order Lines</div>
+                        <table class="grid-table modern-grid">
+                            <thead>
+                                <tr>
+                                    <th class="col-no">No.</th>
+                                    <th>Description</th>
+                                    <th class="col-other">Other Name</th>
+                                    <th class="col-qty">Qty</th>
+                                    <th class="col-pkgqty">Pkg Qty</th>
+                                    <th class="col-pkg">Package</th>
+                                    <th class="col-price">Unit Price</th>
+                                    <th class="col-amt">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="lines" t-value="o.order_line.filtered(lambda l: not l.display_type)"/>
+                                <tr t-foreach="lines" t-as="line">
+                                    <td class="text-center"><span t-out="line_index + 1"/></td>
+                                    <td><span t-field="line.name"/></td>
+                                    <td>
+                                        <span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/>
+                                    </td>
+                                    <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                                    <td class="text-end">
+                                        <span t-if="line.product_packaging_qty" t-field="line.product_packaging_qty"/>
+                                        <span t-else="">-</span>
+                                    </td>
+                                    <td>
+                                        <span t-if="line.product_packaging_id" t-field="line.product_packaging_id"/>
+                                        <span t-else="">-</span>
+                                    </td>
+                                    <td class="text-end"><span t-field="line.price_unit"/></td>
+                                    <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="totals-table">
+                            <tr>
+                                <td>Subtotal</td>
+                                <td class="text-end"><span t-field="o.amount_untaxed"/></td>
+                            </tr>
+                            <tr>
+                                <td>Taxes</td>
+                                <td class="text-end"><span t-field="o.amount_tax"/></td>
+                            </tr>
+                            <tr class="grand-total">
+                                <td>Total</td>
+                                <td class="text-end"><span t-field="o.amount_total"/></td>
+                            </tr>
+                        </table>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

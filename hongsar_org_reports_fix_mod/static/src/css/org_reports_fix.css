@@ -1,0 +1,51 @@
+/* Pyidaungsu — place TTF files in hongsar_org_reports_fix_mod/static/fonts/ (see README there) */
+@font-face {
+    font-family: 'Pyidaungsu';
+    src: url(/hongsar_org_reports_fix_mod/static/fonts/Pyidaungsu-2.5_Regular.ttf) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Pyidaungsu';
+    src: url(/hongsar_org_reports_fix_mod/static/fonts/Pyidaungsu-2.5_Bold.ttf) format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Myanmar font for all report output (PDF + HTML preview) */
+body,
+.page,
+table,
+td,
+th,
+div,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+address,
+strong,
+b,
+i,
+em,
+small,
+.o_report_layout,
+.article {
+    font-family: 'Pyidaungsu', 'Pyidaungsu Regular', 'Noto Sans Myanmar', 'Padauk', sans-serif !important;
+}
+
+strong,
+b,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: bold;
+}
