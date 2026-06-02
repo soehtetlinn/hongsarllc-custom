@@ -132,14 +132,20 @@
       }
       .meta-table strong { color: #19396f; }
 
+      .classic-grid tr {
+        page-break-inside: avoid;
+      }
       .classic-grid th, .classic-grid td {
         border: 1px solid #000000;
         padding: 6px 8px;
         vertical-align: top;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
       .classic-grid {
         border: 1px solid #000000;
         margin-top: 4px;
+        table-layout: fixed;
       }
       .classic-grid thead th {
         background: #d9e7ff;
@@ -262,14 +268,20 @@
       .meta-label { color: #19396f; }
       .inv-lines-table {
         width: 100%;
+        table-layout: fixed;
         border-collapse: collapse;
         border: 1px solid #000000;
         margin-top: 4px;
+      }
+      .inv-lines-table tr {
+        page-break-inside: avoid;
       }
       .inv-lines-table th, .inv-lines-table td {
         border: 1px solid #000000;
         padding: 5px 6px;
         line-height: 1.25;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
       }
       .inv-lines-table thead th {
         background: #d9e7ff;
@@ -280,10 +292,10 @@
       }
       .inv-lines-table tbody tr:nth-child(even) td { background: #f6f9ff; }
       .inv-lines-table tbody tr:nth-child(odd) td { background: #ffffff; }
-      .inv-lines-table .w-no { width: 3%; }
+      .inv-lines-table .w-no { width: 5%; }
       .inv-lines-table .w-code { width: 8%; }
-      .inv-lines-table .w-desc { width: 22%; }
-      .inv-lines-table .w-name { width: 24%; }
+      .inv-lines-table .w-desc { width: 21%; }
+      .inv-lines-table .w-name { width: 23%; }
       .inv-lines-table .w-case { width: 10%; }
       .inv-lines-table .w-qty { width: 8%; }
       .inv-lines-table .w-unit { width: 10%; }

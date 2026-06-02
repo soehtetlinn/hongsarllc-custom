@@ -39,9 +39,12 @@
 
                     <table class="inv-meta-grid">
                         <tr>
-                            <td class="info-col">
+                            <td class="info-col" style="width: 30%; border-right: none;">
                                 <div><span class="meta-label">Invoice No:</span> <span class="meta-value" t-field="o.name"/></div>
                                 <div><span class="meta-label">Date:</span> <span class="meta-value" t-field="o.invoice_date"/></div>
+                                <div t-if="o.invoice_origin"><span class="meta-label">Quotation #</span> <span class="meta-value" t-field="o.invoice_origin"/></div>
+                            </td>
+                            <td class="info-col" style="width: 70%; border-left: none;">
                             </td>
                         </tr>
                     </table>
@@ -89,8 +92,14 @@
                         <tfoot>
                             <tr>
                                 <td colspan="7" class="sum-label">Total</td>
-                                <td class="sum-value"><span t-field="o.amount_untaxed"/></td>
+                                <td class="sum-value"><span t-field="o.amount_total"/></td>
                             </tr>
+                            <t t-if="o.amount_total != o.amount_residual">
+                                <tr>
+                                    <td colspan="7" class="sum-label">Purchase</td>
+                                    <td class="sum-value">-<span t-out="o.amount_total - o.amount_residual" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                </tr>
+                            </t>
                             <tr>
                                 <td colspan="7" class="sum-label">Balance</td>
                                 <td class="sum-value"><span t-field="o.amount_residual"/></td>

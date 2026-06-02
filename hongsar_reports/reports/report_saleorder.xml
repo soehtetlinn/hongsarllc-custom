@@ -12,7 +12,7 @@
 
                         <table class="meta-table">
                             <tr>
-                                <td><strong>Document No:</strong> <span t-field="o.name"/></td>
+                                <td><strong>Quotation #</strong> <span t-field="o.name"/></td>
                                 <td><strong>Date:</strong> <span t-field="o.date_order"/></td>
                             </tr>
                             <tr>

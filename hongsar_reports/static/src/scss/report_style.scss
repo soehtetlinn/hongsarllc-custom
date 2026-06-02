@@ -169,16 +169,23 @@ th,
     color: $hongsar-blue-dark;
 }
 
+.classic-grid tr {
+    page-break-inside: avoid;
+}
+
 .classic-grid th,
 .classic-grid td {
     border: 1px solid $hongsar-grid-border;
     padding: 6px 8px;
     vertical-align: top;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .classic-grid {
     border: 1px solid $hongsar-grid-border;
     margin-top: 4px;
+    table-layout: fixed;
 }
 
 .classic-grid thead th {
@@ -351,10 +358,15 @@ th,
 
 .inv-lines-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
     font-size: 1em;
     border: 1px solid $hongsar-grid-border;
     margin-top: 4px;
+}
+
+.inv-lines-table tr {
+    page-break-inside: avoid;
 }
 
 .inv-lines-table th,
@@ -362,6 +374,8 @@ th,
     border: 1px solid $hongsar-grid-border;
     padding: 5px 6px;
     line-height: 1.25;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .inv-lines-table thead th {
@@ -381,7 +395,7 @@ th,
 }
 
 .inv-lines-table .w-no {
-    width: 3%;
+    width: 5%;
 }
 
 .inv-lines-table .w-code {
@@ -389,11 +403,11 @@ th,
 }
 
 .inv-lines-table .w-desc {
-    width: 22%;
+    width: 21%;
 }
 
 .inv-lines-table .w-name {
-    width: 24%;
+    width: 23%;
 }
 
 .inv-lines-table .w-case {
