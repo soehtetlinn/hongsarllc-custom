@@ -60,13 +60,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <t t-set="lines" t-value="o.invoice_line_ids.filtered(lambda l: not l.display_type)"/>
+                            <t t-set="lines" t-value="o.invoice_line_ids.filtered(lambda l: l.display_type == 'product')"/>
                             <tr t-foreach="lines" t-as="line">
                                 <td class="text-center"><span t-out="line_index + 1"/></td>
                                 <td class="text-center"><span t-out="line.product_id.default_code or '-'"/></td>
                                 <td><span t-out="(line.name or '').split('\n')[0]"/></td>
                                 <td><span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/></td>
-                                <td class="text-center"><span t-out="line.product_packaging_id and line.product_packaging_id.name or '-'"/></td>
+                                <td class="text-center"><span t-out="line.product_id.packaging_ids and line.product_id.packaging_ids[0].name or '-'"/></td>
                                 <td class="text-end"><span t-field="line.quantity"/></td>
                                 <td class="text-end"><span t-field="line.price_unit"/></td>
                                 <td class="text-end"><span t-field="line.price_subtotal"/></td>
