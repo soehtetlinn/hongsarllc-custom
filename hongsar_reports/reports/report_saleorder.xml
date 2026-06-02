@@ -35,24 +35,38 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-set="lines" t-value="o.order_line.filtered(lambda l: not l.display_type)"/>
-                                <tr t-foreach="lines" t-as="line">
-                                    <td class="text-center"><span t-out="line_index + 1"/></td>
-                                    <td><span t-field="line.name"/></td>
-                                    <td>
-                                        <span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/>
-                                    </td>
-                                    <td class="text-end"><span t-field="line.product_uom_qty"/></td>
-                                    <td class="text-end">
-                                        <span t-if="line.product_packaging_qty" t-field="line.product_packaging_qty"/>
-                                        <span t-else="">-</span>
-                                    </td>
-                                    <td>
-                                        <span t-if="line.product_packaging_id" t-field="line.product_packaging_id"/>
-                                        <span t-else="">-</span>
-                                    </td>
-                                    <td class="text-end"><span t-field="line.price_unit"/></td>
-                                    <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                <t t-set="lines" t-value="o.order_line.filtered(lambda l: not l.display_type or l.display_type in ('line_section', 'line_note'))"/>
+                                <t t-set="p_idx" t-value="1"/>
+                                <tr t-foreach="lines" t-as="line" t-att-class="'fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type">
+                                        <td class="text-center"><span t-out="p_idx"/></td>
+                                        <td><span t-field="line.name"/></td>
+                                        <td>
+                                            <span t-out="line.product_id.product_tmpl_id.product_other_name or '-'"/>
+                                        </td>
+                                        <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                                        <td class="text-end">
+                                            <span t-if="line.product_packaging_qty" t-field="line.product_packaging_qty"/>
+                                            <span t-else="">-</span>
+                                        </td>
+                                        <td>
+                                            <span t-if="line.product_packaging_id" t-field="line.product_packaging_id"/>
+                                            <span t-else="">-</span>
+                                        </td>
+                                        <td class="text-end"><span t-field="line.price_unit"/></td>
+                                        <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                        <t t-set="p_idx" t-value="p_idx + 1"/>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_section'">
+                                        <td colspan="8" style="background-color: #f6f9ff; padding-left: 10px;">
+                                            <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                        </td>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_note'">
+                                        <td colspan="8" style="color: #000000; padding-left: 20px;">
+                                            <span t-field="line.name" t-options="{'widget': 'text'}"/>
+                                        </td>
+                                    </t>
                                 </tr>
                             </tbody>
                         </table>
