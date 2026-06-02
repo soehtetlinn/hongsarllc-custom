@@ -141,6 +141,8 @@
         vertical-align: top;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        word-break: break-word;
+        box-sizing: border-box;
       }
       .classic-grid {
         border: 1px solid #000000;
@@ -282,6 +284,8 @@
         line-height: 1.25;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        word-break: break-word;
+        box-sizing: border-box;
       }
       .inv-lines-table thead th {
         background: #d9e7ff;

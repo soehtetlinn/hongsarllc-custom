@@ -180,6 +180,8 @@ th,
     vertical-align: top;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    word-break: break-word;
+    box-sizing: border-box;
 }
 
 .classic-grid {
@@ -376,6 +378,8 @@ th,
     line-height: 1.25;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    word-break: break-word;
+    box-sizing: border-box;
 }
 
 .inv-lines-table thead th {
