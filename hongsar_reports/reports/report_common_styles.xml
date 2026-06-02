@@ -287,8 +287,8 @@
         background: #d9e7ff;
         color: #2b3f66;
         text-align: center;
-        white-space: nowrap;
         border-color: #000000;
+        white-space: normal;
       }
       .inv-lines-table tbody tr:nth-child(even) td { background: #f6f9ff; }
       .inv-lines-table tbody tr:nth-child(odd) td { background: #ffffff; }
