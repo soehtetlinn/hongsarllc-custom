@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Hongsar Formal Reports',
-    'version': '18.0.1.0.2',
+    'version': '18.0.2.0.0',
     'category': 'Accounting/Reporting',
-    'summary': 'Formal Myanmar-ready custom Sales Order and Invoice reports',
+    'summary': 'Formal Myanmar-ready custom Sales Order and Invoice reports with WeasyPrint',
     'description': """
 Hongsar Formal Reports
 ======================
@@ -13,15 +13,21 @@ Provides standalone formal PDF reports for:
 - Customer Invoice / Credit Note
 
 Features:
-- Modern formal layout with clear table grid lines
+- Classic formal layout with clear table grid lines
 - Company logo and structured address blocks
-- Myanmar Unicode compatible PDF rendering
-- Parallel-safe rollout with separate report actions
+- WeasyPrint PDF engine for proper Myanmar Unicode rendering
+- Automatic fallback: uses WeasyPrint when Myanmar text detected, wkhtmltopdf otherwise
+- Pyidaungsu font support
+
+Requirements:
+- pip install weasyprint
     """,
     'author': 'Custom',
     'depends': ['base', 'web', 'sale', 'account', 'hongsar_internal_mod'],
     'data': [
         'data/report_paperformat.xml',
+        'reports/report_assets.xml',
+        'reports/report_common_styles.xml',
         'reports/report_layout.xml',
         'reports/report_saleorder.xml',
         'reports/report_invoice.xml',
@@ -29,11 +35,13 @@ Features:
     ],
     'assets': {
         'web.report_assets_common': [
+            'hongsar_reports/static/src/css/report_fonts.css',
             'hongsar_reports/static/src/scss/report_style.scss',
         ],
-    },
-    'external_dependencies': {
-        'python': ['weasyprint'],
+        'web.report_assets_pdf': [
+            'hongsar_reports/static/src/css/report_fonts.css',
+            'hongsar_reports/static/src/scss/report_style.scss',
+        ],
     },
     'installable': True,
     'application': False,

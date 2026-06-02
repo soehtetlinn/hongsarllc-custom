@@ -10,33 +10,18 @@
                             <t t-else="">Sales Order</t>
                         </h2>
 
-                        <div class="section-card">
-                            <table class="meta-table">
-                                <tr>
-                                    <td><strong>Document No:</strong> <span t-field="o.name"/></td>
-                                    <td><strong>Date:</strong> <span t-field="o.date_order"/></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Customer Ref:</strong> <span t-out="o.client_order_ref or '-'"/></td>
-                                    <td><strong>Salesperson:</strong> <span t-out="o.user_id.name or '-'"/></td>
-                                </tr>
-                            </table>
-                        </div>
+                        <table class="meta-table">
+                            <tr>
+                                <td><strong>Document No:</strong> <span t-field="o.name"/></td>
+                                <td><strong>Date:</strong> <span t-field="o.date_order"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Customer Ref:</strong> <span t-out="o.client_order_ref or '-'"/></td>
+                                <td><strong>Salesperson:</strong> <span t-out="o.user_id.name or '-'"/></td>
+                            </tr>
+                        </table>
 
-                        <div class="section-title">Customer Information</div>
-                        <div class="section-card">
-                            <table class="party-table">
-                                <tr>
-                                    <td colspan="2">
-                                        <div><strong>Email:</strong> <span t-out="o.partner_id.email or '-'"/></div>
-                                        <div><strong>Tax ID:</strong> <span t-out="o.partner_id.vat or '-'"/></div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <div class="section-title">Order Lines</div>
-                        <table class="grid-table modern-grid">
+                        <table class="grid-table classic-grid">
                             <thead>
                                 <tr>
                                     <th class="col-no">No.</th>
@@ -82,8 +67,8 @@
                                 <td class="text-end"><span t-field="o.amount_tax"/></td>
                             </tr>
                             <tr class="grand-total">
-                                <td>Total</td>
-                                <td class="text-end"><span t-field="o.amount_total"/></td>
+                                <td><strong>Total</strong></td>
+                                <td class="text-end"><strong><span t-field="o.amount_total"/></strong></td>
                             </tr>
                         </table>
 

@@ -3,6 +3,7 @@
     <template id="report_invoice_document_hongsar">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
+                <t t-call="hongsar_reports.hongsar_report_common_styles"/>
                 <div class="hongsar-invoice-wrap">
                     <div class="inv-top-header">
                         <div class="inv-logo-col">

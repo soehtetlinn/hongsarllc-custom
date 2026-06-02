@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Myanmar-safe PDF rendering for formal Hongsar reports.
+WeasyPrint PDF renderer for Myanmar text support.
+
+wkhtmltopdf cannot properly render Myanmar Unicode due to missing HarfBuzz support.
+WeasyPrint has proper complex text shaping and renders Myanmar correctly.
 """
 import io
 import logging
@@ -15,10 +18,13 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 
+REPORT_FONT_SIZE_PX = 14
+
 _MYANMAR_PATTERN = re.compile(r'[\u1000-\u109F\uAA60-\uAA7F\uA9E0-\uA9FF]')
 
 
 def _has_myanmar_text(text):
+    """Check if text contains Myanmar characters."""
     return bool(_MYANMAR_PATTERN.search(text)) if text else False
 
 
@@ -26,12 +32,14 @@ class IrActionsReport(models.Model):
     _inherit = 'ir.actions.report'
 
     def _get_weasyprint_base_url(self):
+        """Get base URL for WeasyPrint to resolve relative paths."""
         if request:
             return request.httprequest.host_url
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         return base_url or 'http://localhost:8069'
 
     def _weasyprint_subst_header_footer(self, header_html, footer_html, page_index):
+        """Mimic wkhtmltopdf minimal_layout subst()."""
         def _select_child(container_id, html_str):
             if not html_str:
                 return html_str
@@ -52,6 +60,7 @@ class IrActionsReport(models.Model):
         return h, f
 
     def _sanitize_html_for_weasyprint(self, html_string):
+        """Fix Odoo HTML that causes WeasyPrint clipping issues."""
         if not html_string:
             return html_string
         try:
@@ -84,44 +93,51 @@ class IrActionsReport(models.Model):
         return lxml.html.tostring(doc, encoding='unicode', method='html', doctype='<!DOCTYPE html>')
 
     def _merge_header_footer_into_body(self, body, header=None, footer=None):
+        """Insert Odoo PDF header/footer for WeasyPrint running elements."""
         header_content = ''
         footer_content = ''
 
         if header:
             match = re.search(r'<body[^>]*>(.*?)</body>', header, re.DOTALL | re.IGNORECASE)
-            header_content = match.group(1).strip() if match else header.strip()
+            if match:
+                header_content = match.group(1).strip()
+            else:
+                header_content = header.strip()
 
         if footer:
             match = re.search(r'<body[^>]*>(.*?)</body>', footer, re.DOTALL | re.IGNORECASE)
-            footer_content = match.group(1).strip() if match else footer.strip()
+            if match:
+                footer_content = match.group(1).strip()
+            else:
+                footer_content = footer.strip()
 
         if header_content:
             def _after_open_body(m):
                 return (
                     m.group(1)
-                    + '<div class="o_weasy_running_header"><div class="o_weasy_running_inset">'
+                    + '<div class="o_weasy_running_header">'
+                    + '<div class="o_weasy_running_inset">'
                     + header_content
                     + '</div></div>'
                 )
-
             body = re.sub(r'(<body[^>]*>)', _after_open_body, body, count=1, flags=re.IGNORECASE)
 
         if footer_content:
             def _after_open_body_for_footer(m):
                 return (
                     m.group(1)
-                    + '<div class="o_weasy_running_footer"><div class="o_weasy_running_inset">'
+                    + '<div class="o_weasy_running_footer">'
+                    + '<div class="o_weasy_running_inset">'
                     + footer_content
                     + '</div></div>'
                 )
-
             body = re.sub(r'(<body[^>]*>)', _after_open_body_for_footer, body, count=1, flags=re.IGNORECASE)
 
         return body, bool(header_content), bool(footer_content)
 
-    def _weasyprint_margins_mm(
-            self, paperformat_id, specific_paperformat_args,
-            has_running_header=False, has_running_footer=False):
+    def _weasyprint_margins_mm(self, paperformat_id, specific_paperformat_args,
+                               has_running_header=False, has_running_footer=False):
+        """Calculate margins matching Odoo wkhtmltopdf."""
         args = specific_paperformat_args or {}
         mt = float(args.get('data-report-margin-top') or (paperformat_id.margin_top if paperformat_id else 40))
         mb = float(args.get('data-report-margin-bottom') or (paperformat_id.margin_bottom if paperformat_id else 20))
@@ -129,9 +145,9 @@ class IrActionsReport(models.Model):
         mr = float(paperformat_id.margin_right if paperformat_id else 7)
         mlr = max(ml, mr)
         if has_running_header:
-            mt += 6.0
+            mt = min(mt, 26.0) + 2.0
         if has_running_footer:
-            mb += 4.0
+            mb = min(mb, 18.0) + 2.0
         return mt, mb, mlr
 
     def _weasyprint_page_size_css(self, paperformat_id, landscape):
@@ -143,14 +159,8 @@ class IrActionsReport(models.Model):
             return f'{fmt} landscape'
         return fmt
 
-    def _build_weasyprint_stylesheet_string(
-            self,
-            paperformat_id,
-            specific_paperformat_args,
-            landscape,
-            has_running_header,
-            has_running_footer,
-    ):
+    def _build_weasyprint_stylesheet_string(self, paperformat_id, specific_paperformat_args,
+                                            landscape, has_running_header, has_running_footer):
         mt, mb, mlr = self._weasyprint_margins_mm(
             paperformat_id, specific_paperformat_args, has_running_header, has_running_footer)
         size = self._weasyprint_page_size_css(paperformat_id, landscape)
@@ -160,9 +170,9 @@ class IrActionsReport(models.Model):
             page_extra.append('''
             @top-center {
                 content: element(weasy-doc-header);
-                vertical-align: bottom;
+                vertical-align: top;
                 text-align: left;
-                padding: 2mm 6mm 6mm 6mm;
+                padding: 3px 6mm 1mm 6mm;
                 margin: 0;
                 width: 100%;
             }''')
@@ -187,49 +197,95 @@ class IrActionsReport(models.Model):
         running_css = []
         if has_running_header:
             running_css.append('''
-            .o_weasy_running_header { position: running(weasy-doc-header); width: 100%; }
+            .o_weasy_running_header {
+                position: running(weasy-doc-header);
+                width: 100%;
+                box-sizing: border-box;
+                overflow: visible !important;
+                line-height: 1.3 !important;
+            }
             ''')
         if has_running_footer:
             running_css.append('''
-            .o_weasy_running_footer { position: running(weasy-doc-footer); width: 100%; }
+            .o_weasy_running_footer {
+                position: running(weasy-doc-footer);
+                width: 100%;
+                box-sizing: border-box;
+                overflow: visible !important;
+                line-height: 1.55 !important;
+            }
             ''')
 
         base = f'''
             {page_rule}
             {''.join(running_css)}
-            html {{ height: auto !important; min-height: 0 !important; }}
-            body, html {{ overflow: visible !important; }}
-            .o_weasy_running_header .o_weasy_running_inset,
-            .o_weasy_running_footer .o_weasy_running_inset {{
-                padding: 3mm 11mm 1mm 11mm;
+            html {{
+                height: auto !important;
+                min-height: 0 !important;
+            }}
+            body, html {{
+                overflow: visible !important;
+            }}
+            .o_weasy_running_header .o_weasy_running_inset {{
+                padding: 5px 11mm 0.5mm 11mm;
                 box-sizing: border-box !important;
                 overflow: visible !important;
             }}
-            body.o_body_pdf, body.o_body_pdf table {{ line-height: 1.55 !important; }}
-            body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6, address, strong,
-            b, i, em, small, .page, article, .o_report_layout, .article,
-            .o_weasy_running_header, .o_weasy_running_footer {{
-                font-family: 'Noto Sans Myanmar', 'Padauk', 'Lato', 'DejaVu Sans', 'FreeSans', sans-serif !important;
+            .o_weasy_running_footer .o_weasy_running_inset {{
+                padding: 0.5mm 11mm 0.5mm 11mm;
+                box-sizing: border-box !important;
+                overflow: visible !important;
             }}
-            /* WeasyPrint doesn't replace wkhtmltopdf page/topage JS spans, use CSS counters */
-            .page::before {{
+            .o_weasy_running_footer .page::before {{
                 content: counter(page);
             }}
-            .topage::before {{
+            .o_weasy_running_footer .topage::before {{
                 content: counter(pages);
+            }}
+            body.o_body_pdf.container {{
+                max-width: none !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                padding-left: 11mm !important;
+                padding-right: 11mm !important;
+                padding-top: 0 !important;
+            }}
+            body.o_body_pdf td, body.o_body_pdf th {{
+                overflow: visible !important;
+            }}
+            body.o_body_pdf, body.o_body_pdf table {{
+                line-height: 1.55 !important;
+            }}
+            /* Hongsar report styles */
+            .hongsar-report-wrap,
+            .hongsar-report-wrap table,
+            .hongsar-report-wrap td,
+            .hongsar-report-wrap th,
+            .hongsar-report-wrap div,
+            .hongsar-report-wrap span,
+            .hongsar-report-wrap p,
+            .hongsar-invoice-wrap,
+            .hongsar-invoice-wrap table,
+            .hongsar-invoice-wrap td,
+            .hongsar-invoice-wrap th,
+            .hongsar-invoice-wrap div,
+            .hongsar-invoice-wrap span,
+            .hongsar-invoice-wrap p {{
+                font-size: {REPORT_FONT_SIZE_PX}px !important;
+            }}
+            body, table, td, th, div, span, p, h1, h2, h3, h4, h5, h6,
+            address, strong, b, i, em, small, .page, article,
+            .o_report_layout, .article, .o_weasy_running_header, .o_weasy_running_footer,
+            .hongsar-report-wrap, .hongsar-report-wrap *,
+            .hongsar-invoice-wrap, .hongsar-invoice-wrap * {{
+                font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', 'Lato', 'DejaVu Sans', sans-serif !important;
             }}
         '''
         return base
 
-    def _render_weasyprint_pdf(
-            self,
-            bodies,
-            header=None,
-            footer=None,
-            report_ref=False,
-            specific_paperformat_args=None,
-            landscape=False,
-    ):
+    def _render_weasyprint_pdf(self, bodies, header=None, footer=None, report_ref=False,
+                               specific_paperformat_args=None, landscape=False):
+        """Render HTML to PDF using WeasyPrint."""
         try:
             from weasyprint import CSS, HTML
             from weasyprint.text.fonts import FontConfiguration
@@ -242,6 +298,7 @@ class IrActionsReport(models.Model):
         paperformat_id = self._get_report(report_ref).get_paperformat() if report_ref else self.get_paperformat()
 
         pdf_files = []
+
         for page_index, body in enumerate(bodies):
             try:
                 h, f = header, footer
@@ -261,45 +318,53 @@ class IrActionsReport(models.Model):
                 processed_body = self._sanitize_html_for_weasyprint(processed_body)
 
                 css_string = self._build_weasyprint_stylesheet_string(
-                    paperformat_id, specific_paperformat_args, landscape, has_rh, has_rf
-                )
+                    paperformat_id, specific_paperformat_args, landscape, has_rh, has_rf)
                 myanmar_font_css = CSS(string=css_string, font_config=font_config)
+
                 html_doc = HTML(string=processed_body, base_url=base_url)
                 pdf_bytes = html_doc.write_pdf(stylesheets=[myanmar_font_css], font_config=font_config)
                 pdf_files.append(io.BytesIO(pdf_bytes))
-            except Exception:
-                _logger.exception("WeasyPrint rendering error for body")
+
+            except Exception as e:
+                _logger.error("WeasyPrint rendering error: %s", e)
+                import traceback
+                _logger.error(traceback.format_exc())
                 return None
 
         if not pdf_files:
             return None
+
         if len(pdf_files) == 1:
             return pdf_files[0].getvalue()
 
         try:
-            from PyPDF2 import PdfFileReader, PdfFileWriter
-            writer = PdfFileWriter()
+            from PyPDF2 import PdfReader, PdfWriter
+            writer = PdfWriter()
             for pdf_file in pdf_files:
-                reader = PdfFileReader(pdf_file)
-                for page_num in range(reader.getNumPages()):
-                    writer.addPage(reader.getPage(page_num))
+                reader = PdfReader(pdf_file)
+                for page in reader.pages:
+                    writer.add_page(page)
             output = io.BytesIO()
             writer.write(output)
             return output.getvalue()
-        except Exception:
-            _logger.exception("PDF merge error")
+        except Exception as e:
+            _logger.error("PDF merge error: %s", e)
             return pdf_files[0].getvalue()
 
     @api.model
-    def _run_wkhtmltopdf(
-            self,
-            bodies,
-            report_ref=False,
-            header=None,
-            footer=None,
-            landscape=False,
-            specific_paperformat_args=None,
-            set_viewport_size=False):
+    def _build_wkhtmltopdf_args(self, paperformat_id, landscape, specific_paperformat_args=None, set_viewport_size=False):
+        """Override to ensure utf-8 encoding is always used by wkhtmltopdf."""
+        args = super()._build_wkhtmltopdf_args(
+            paperformat_id, landscape, specific_paperformat_args=specific_paperformat_args,
+            set_viewport_size=set_viewport_size)
+        if '--encoding' not in args:
+            args.extend(['--encoding', 'utf-8'])
+        return args
+
+    @api.model
+    def _run_wkhtmltopdf(self, bodies, report_ref=False, header=None, footer=None,
+                         landscape=False, specific_paperformat_args=None, set_viewport_size=False):
+        """Use WeasyPrint for Myanmar text, wkhtmltopdf for others."""
         has_myanmar = any(_has_myanmar_text(b) for b in bodies)
         if not has_myanmar and header:
             has_myanmar = _has_myanmar_text(header)
@@ -310,25 +375,15 @@ class IrActionsReport(models.Model):
             _logger.info("Myanmar text detected - using WeasyPrint for proper Unicode rendering")
             try:
                 pdf_content = self._render_weasyprint_pdf(
-                    bodies,
-                    header=header,
-                    footer=footer,
-                    report_ref=report_ref,
-                    specific_paperformat_args=specific_paperformat_args,
-                    landscape=landscape,
-                )
+                    bodies, header=header, footer=footer, report_ref=report_ref,
+                    specific_paperformat_args=specific_paperformat_args, landscape=landscape)
                 if pdf_content:
                     return pdf_content
                 _logger.warning("WeasyPrint rendering failed, falling back to wkhtmltopdf")
-            except Exception:
-                _logger.exception("WeasyPrint error, falling back to wkhtmltopdf")
+            except Exception as e:
+                _logger.warning("WeasyPrint error, falling back to wkhtmltopdf: %s", e)
 
         return super()._run_wkhtmltopdf(
-            bodies,
-            report_ref=report_ref,
-            header=header,
-            footer=footer,
-            landscape=landscape,
-            specific_paperformat_args=specific_paperformat_args,
-            set_viewport_size=set_viewport_size,
-        )
+            bodies, report_ref=report_ref, header=header, footer=footer,
+            landscape=landscape, specific_paperformat_args=specific_paperformat_args,
+            set_viewport_size=set_viewport_size)

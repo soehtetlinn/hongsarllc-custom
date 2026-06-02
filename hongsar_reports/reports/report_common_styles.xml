@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <!-- Shared PDF styles. Pyidaungsu font is embedded as base64 in report_fonts.css -->
+  <template id="hongsar_report_common_styles">
+    <!-- Force UTF-8 encoding for wkhtmltopdf -->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="/hongsar_reports/static/src/css/report_fonts.css"/>
+    <style>
+      /* Pyidaungsu @font-face is in report_fonts.css (base64-embedded for wkhtmltopdf) */
+      /* !important: Odoo report CSS sets smaller font-size on table/td — must override for PDF */
+      .hongsar-report-wrap,
+      .hongsar-report-wrap table,
+      .hongsar-report-wrap thead,
+      .hongsar-report-wrap tbody,
+      .hongsar-report-wrap tr,
+      .hongsar-report-wrap td,
+      .hongsar-report-wrap th,
+      .hongsar-report-wrap div,
+      .hongsar-report-wrap span,
+      .hongsar-report-wrap p,
+      .hongsar-report-wrap h1,
+      .hongsar-report-wrap h2,
+      .hongsar-report-wrap h3,
+      .hongsar-report-wrap strong,
+      .hongsar-report-wrap b,
+      .hongsar-report-wrap .formal-report-page,
+      .hongsar-report-wrap .formal-report-page * {
+        font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif !important;
+        font-size: 16px !important;
+        line-height: 1.45 !important;
+      }
+      .hongsar-invoice-wrap,
+      .hongsar-invoice-wrap table,
+      .hongsar-invoice-wrap thead,
+      .hongsar-invoice-wrap tbody,
+      .hongsar-invoice-wrap tr,
+      .hongsar-invoice-wrap td,
+      .hongsar-invoice-wrap th,
+      .hongsar-invoice-wrap div,
+      .hongsar-invoice-wrap span,
+      .hongsar-invoice-wrap p,
+      .hongsar-invoice-wrap strong,
+      .hongsar-invoice-wrap b,
+      .hongsar-invoice-wrap * {
+        font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif !important;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+      }
+      .hongsar-report-wrap strong, .hongsar-report-wrap b,
+      .hongsar-report-wrap th, .hongsar-invoice-wrap strong, .hongsar-invoice-wrap b,
+      .hongsar-invoice-wrap th, .company-name, .customer-label,
+      .formal-report-page .doc-title, .classic-grid thead th,
+      .totals-table .grand-total td, .inv-company-name, .meta-label,
+      .inv-strip-title, .inv-lines-table thead th,
+      .inv-lines-table tfoot .sum-label, .inv-lines-table tfoot .sum-value,
+      .inv-status-box {
+        font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif !important;
+        font-weight: bold !important;
+      }
+
+      .hongsar-report-wrap {
+        color: #1a2233;
+      }
+
+      .formal-report-page .doc-title {
+        font-size: 18px !important;
+      }
+
+      .hongsar-footer,
+      .hongsar-footer span {
+        font-size: 13px !important;
+      }
+
+      /* ---- Sales Order header (no grid) ---- */
+      .hongsar-header {
+        width: 100%;
+        border-collapse: collapse;
+        border: none;
+        margin-bottom: 12px;
+        background: transparent;
+      }
+      .hongsar-header td {
+        vertical-align: top;
+        padding: 8px 10px;
+        line-height: 1.45;
+        border: none;
+        background: transparent;
+      }
+      .hongsar-header .company-left {
+        width: 18%;
+        text-align: center;
+      }
+      .hongsar-header .company-center {
+        width: 42%;
+      }
+      .hongsar-header .customer-right {
+        width: 40%;
+        text-align: right;
+      }
+      .customer-label {
+        color: #19396f;
+        text-transform: uppercase;
+        font-size: 1em;
+        margin-bottom: 4px;
+        padding-bottom: 3px;
+      }
+      .company-name { color: #0f2350; margin-bottom: 2px; }
+      .company-logo { max-height: 64px; max-width: 140px; object-fit: contain; }
+
+      /* ---- Sales Order body ---- */
+      .formal-report-page .doc-title {
+        text-align: center;
+        margin: 6px 0 10px;
+        padding: 6px 8px;
+        color: #0f2557;
+        background: transparent;
+        border: none;
+      }
+      .meta-table, .grid-table, .totals-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .meta-table {
+        margin-bottom: 12px;
+        border: 1px solid #000000;
+      }
+      .meta-table td {
+        border: 1px solid #000000;
+        padding: 6px 8px;
+        vertical-align: top;
+        background: #f6f9ff;
+      }
+      .meta-table strong { color: #19396f; }
+
+      .classic-grid th, .classic-grid td {
+        border: 1px solid #000000;
+        padding: 6px 8px;
+        vertical-align: top;
+      }
+      .classic-grid {
+        border: 1px solid #000000;
+        margin-top: 4px;
+      }
+      .classic-grid thead th {
+        background: #d9e7ff;
+        color: #152f5d;
+        text-align: center;
+        border-color: #000000;
+      }
+      .classic-grid tbody tr:nth-child(even) td { background: #f6f9ff; }
+      .classic-grid tbody tr:nth-child(odd) td { background: #ffffff; }
+
+      .col-no { width: 6%; }
+      .col-other { width: 14%; }
+      .col-qty, .col-pkgqty, .col-price, .col-amt { width: 10%; }
+      .col-pkg { width: 11%; }
+      .text-center { text-align: center; }
+      .text-end { text-align: right; }
+
+      .totals-table {
+        width: 42%;
+        margin-left: auto;
+        margin-top: 12px;
+        border: 1px solid #000000;
+      }
+      .totals-table td {
+        border: 1px solid #000000;
+        padding: 6px 8px;
+        vertical-align: top;
+      }
+      .totals-table td:first-child {
+        background: #f1f6ff;
+        color: #19396f;
+        width: 55%;
+      }
+      .totals-table .grand-total td {
+        background: #cfe0ff !important;
+        color: #102654;
+        border-top: 2px solid #000000;
+      }
+
+      .hongsar-footer {
+        margin-top: 10px;
+        font-size: 0.85em;
+        color: #4b5f86;
+        border: none;
+        padding-top: 6px;
+      }
+      .hongsar-footer .page-number { text-align: center; }
+
+      /* ---- Invoice ---- */
+      .hongsar-invoice-wrap {
+        color: #263247;
+        border: none;
+        padding: 8px;
+        background: #ffffff;
+      }
+
+      .inv-strip-title {
+        font-size: 16px !important;
+      }
+
+      .inv-status-box {
+        font-size: 22px !important;
+      }
+      .inv-top-header {
+        display: grid;
+        grid-template-columns: 86px 1fr 1fr;
+        border: none;
+        background: transparent;
+        align-items: start;
+      }
+      .inv-logo-col {
+        padding: 4px;
+        border: none;
+        background: transparent;
+      }
+      .inv-logo { max-height: 56px; max-width: 76px; object-fit: contain; }
+      .inv-company-col {
+        padding: 4px 8px;
+        line-height: 1.35;
+        font-size: 1em;
+        background: transparent;
+        border: none;
+      }
+      .inv-customer-col {
+        padding: 4px 8px;
+        line-height: 1.35;
+        font-size: 1em;
+        text-align: right;
+        background: transparent;
+        border: none;
+      }
+      .inv-company-name { color: #b32323; font-size: 1.1em; }
+      .inv-strip {
+        text-align: center;
+        font-size: 0.95em;
+        padding: 2px 6px;
+        border: none;
+      }
+      .inv-strip-green { background: #e7f6e7; color: #2f5f2f; }
+      .inv-strip-title {
+        background: #dfeaff;
+        color: #ca2222;
+        letter-spacing: 0.5px;
+        border: none;
+      }
+      .inv-meta-grid {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 3px;
+        margin-bottom: 4px;
+        border: 1px solid #000000;
+      }
+      .inv-meta-grid td {
+        border: 1px solid #000000;
+        padding: 5px 7px;
+        vertical-align: top;
+        line-height: 1.3;
+        background: #f6f9ff;
+      }
+      .meta-label { color: #19396f; }
+      .inv-lines-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #000000;
+        margin-top: 4px;
+      }
+      .inv-lines-table th, .inv-lines-table td {
+        border: 1px solid #000000;
+        padding: 5px 6px;
+        line-height: 1.25;
+      }
+      .inv-lines-table thead th {
+        background: #d9e7ff;
+        color: #2b3f66;
+        text-align: center;
+        white-space: nowrap;
+        border-color: #000000;
+      }
+      .inv-lines-table tbody tr:nth-child(even) td { background: #f6f9ff; }
+      .inv-lines-table tbody tr:nth-child(odd) td { background: #ffffff; }
+      .inv-lines-table .w-no { width: 3%; }
+      .inv-lines-table .w-code { width: 8%; }
+      .inv-lines-table .w-desc { width: 22%; }
+      .inv-lines-table .w-name { width: 24%; }
+      .inv-lines-table .w-case { width: 10%; }
+      .inv-lines-table .w-qty { width: 8%; }
+      .inv-lines-table .w-unit { width: 10%; }
+      .inv-lines-table .w-amt { width: 15%; }
+      .inv-lines-table tfoot .sum-label {
+        text-align: right;
+        background: #ffe7cc;
+        color: #8e4f1a;
+        border-top: 2px solid #000000;
+      }
+      .inv-lines-table tfoot .sum-value {
+        text-align: right;
+        background: #ffe1bf;
+        color: #7f4317;
+        border-top: 2px solid #000000;
+      }
+      .inv-status-box {
+        width: 150px;
+        margin: 12px auto 0;
+        text-align: center;
+        border: 2px solid #ef9d5c;
+        padding: 6px 8px;
+        color: #2e2a1f;
+        background: #fffdfa;
+      }
+    </style>
+  </template>
+</odoo>

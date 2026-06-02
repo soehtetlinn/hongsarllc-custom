@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
         <record id="paperformat_hongsar_formal" model="report.paperformat">
             <field name="name">Hongsar Formal A4</field>
             <field name="default" eval="False"/>

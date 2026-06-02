@@ -1,96 +1,199 @@
+// Pyidaungsu font is embedded as base64 in report_fonts.css for wkhtmltopdf compatibility.
+// Do NOT add @font-face here - it won't work with wkhtmltopdf's isolated rendering.
+
+$hongsar-font-regular: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif;
+
+$hongsar-grid-border: #000000;
+$hongsar-font-base: 16px;
+$hongsar-font-invoice: 14px;
+$hongsar-blue-dark: #19396f;
+$hongsar-blue-title: #0f2557;
+$hongsar-header-bg: #eef5ff;
+$hongsar-cell-bg: #f6f9ff;
+$hongsar-table-head: #d9e7ff;
+$hongsar-total-bg: #cfe0ff;
+$hongsar-meta-bg: #f1f6ff;
+$hongsar-doc-title-bg: #dfeaff;
+
+// Odoo report CSS shrinks table/td — set font-size on every cell with !important
+.hongsar-report-wrap,
+.hongsar-report-wrap table,
+.hongsar-report-wrap thead,
+.hongsar-report-wrap tbody,
+.hongsar-report-wrap tr,
+.hongsar-report-wrap td,
+.hongsar-report-wrap th,
+.hongsar-report-wrap div,
+.hongsar-report-wrap span,
+.hongsar-report-wrap p,
+.hongsar-report-wrap h1,
+.hongsar-report-wrap h2,
+.hongsar-report-wrap h3,
+.hongsar-report-wrap strong,
+.hongsar-report-wrap b,
+.hongsar-report-wrap .formal-report-page,
+.hongsar-report-wrap .formal-report-page * {
+    font-family: $hongsar-font-regular !important;
+    font-size: $hongsar-font-base !important;
+    line-height: 1.45 !important;
+}
+
+.hongsar-invoice-wrap,
+.hongsar-invoice-wrap table,
+.hongsar-invoice-wrap thead,
+.hongsar-invoice-wrap tbody,
+.hongsar-invoice-wrap tr,
+.hongsar-invoice-wrap td,
+.hongsar-invoice-wrap th,
+.hongsar-invoice-wrap div,
+.hongsar-invoice-wrap span,
+.hongsar-invoice-wrap p,
+.hongsar-invoice-wrap strong,
+.hongsar-invoice-wrap b,
+.hongsar-invoice-wrap * {
+    font-family: $hongsar-font-regular !important;
+    font-size: $hongsar-font-invoice !important;
+    line-height: 1.4 !important;
+}
+
 .hongsar-report-wrap {
-    font-family: "Noto Sans Myanmar", "Padauk", "Lato", "DejaVu Sans", "FreeSans", sans-serif;
     color: #1a2233;
-    font-size: 11.5px;
+}
+
+.hongsar-invoice-wrap {
+    color: #1a2233;
+}
+
+strong,
+b,
+th,
+.company-name,
+.customer-label,
+.doc-title,
+.inv-company-name,
+.meta-label,
+.inv-lines-table thead th,
+.grand-total td,
+.inv-strip-title,
+.inv-status-box,
+.inv-lines-table tfoot .sum-label,
+.inv-lines-table tfoot .sum-value {
+    font-family: $hongsar-font-regular !important;
+    font-weight: bold !important;
 }
 
 .hongsar-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    border: 1px solid #d6deeb;
-    background: #f8fbff;
-    border-radius: 10px;
-    padding: 10px 12px;
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
     margin-bottom: 12px;
+    background: transparent;
+}
+
+.hongsar-header td {
+    vertical-align: top;
+    padding: 8px 10px;
+    line-height: 1.45;
+    border: none;
+    background: transparent;
 }
 
 .company-left {
-    width: 30%;
+    width: 18%;
+    text-align: center;
 }
 
-.company-right {
-    width: 68%;
+.company-center {
+    width: 42%;
+}
+
+.customer-right {
+    width: 40%;
     text-align: right;
-    line-height: 1.45;
+}
+
+.customer-label {
+    color: $hongsar-blue-dark;
+    text-transform: uppercase;
+    font-size: 1em;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
 }
 
 .company-logo {
-    max-height: 70px;
-    max-width: 150px;
+    max-height: 64px;
+    max-width: 140px;
     object-fit: contain;
 }
 
 .company-name {
-    font-size: 16px;
-    font-weight: 700;
+    color: #0f2350;
     margin-bottom: 2px;
-    color: #111b2e;
 }
 
 .formal-report-page .doc-title {
     text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 1px;
     margin: 6px 0 10px;
-    color: #11203f;
+    padding: 6px 8px;
+    font-size: 18px !important;
+    color: $hongsar-blue-title;
+    background: transparent;
+    border: none;
+}
+
+.hongsar-footer,
+.hongsar-footer span {
+    font-size: 13px !important;
 }
 
 .meta-table,
-.party-table,
 .grid-table,
 .totals-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.section-card {
-    border: 1px solid #d6deeb;
-    border-radius: 10px;
-    background: #ffffff;
-    overflow: hidden;
-    margin-bottom: 10px;
+.meta-table {
+    margin-bottom: 12px;
+    border: 1px solid $hongsar-grid-border;
 }
 
-.meta-table td,
-.party-table td,
-.grid-table th,
-.grid-table td,
-.totals-table td {
-    border: 1px solid #dbe3f0;
-    padding: 7px 8px;
+.meta-table td {
+    border: 1px solid $hongsar-grid-border;
+    padding: 6px 8px;
+    vertical-align: top;
+    background: $hongsar-cell-bg;
+}
+
+.meta-table strong {
+    color: $hongsar-blue-dark;
+}
+
+.classic-grid th,
+.classic-grid td {
+    border: 1px solid $hongsar-grid-border;
+    padding: 6px 8px;
     vertical-align: top;
 }
 
-.section-title {
-    margin: 10px 0 5px;
-    font-weight: 700;
-    color: #23375d;
+.classic-grid {
+    border: 1px solid $hongsar-grid-border;
+    margin-top: 4px;
 }
 
-.party-col {
-    width: 50%;
+.classic-grid thead th {
+    background: $hongsar-table-head;
+    color: #152f5d;
+    text-align: center;
+    border-color: $hongsar-grid-border;
 }
 
-.modern-grid thead th {
-    background: #eef4ff;
-    font-weight: 700;
-    color: #1c2f52;
-    border-color: #cfdcf6;
+.classic-grid tbody tr:nth-child(even) td {
+    background: $hongsar-cell-bg;
 }
 
-.modern-grid tbody tr:nth-child(even) td {
-    background: #fafcff;
+.classic-grid tbody tr:nth-child(odd) td {
+    background: #ffffff;
 }
 
 .col-no {
@@ -121,56 +224,215 @@
 }
 
 .totals-table {
-    width: 46%;
+    width: 42%;
     margin-left: auto;
-    margin-top: 10px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 0 0 1px #d6deeb inset;
+    margin-top: 12px;
+    border: 1px solid $hongsar-grid-border;
+}
+
+.totals-table td {
+    border: 1px solid $hongsar-grid-border;
+    padding: 6px 8px;
+    vertical-align: top;
+}
+
+.totals-table td:first-child {
+    background: $hongsar-meta-bg;
+    color: $hongsar-blue-dark;
+    width: 55%;
 }
 
 .totals-table .grand-total td {
-    font-weight: 700;
-    background: #eaf1ff;
-    color: #14284d;
-}
-
-.payment-status {
-    margin-top: 10px;
-    border: 1px solid #ccd7ea;
-    border-radius: 8px;
-    background: #f8fbff;
-    padding: 7px 9px;
-}
-
-.signature-grid {
-    display: table;
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: separate;
-    border-spacing: 8px 0;
-}
-
-.sign-box {
-    display: table-cell;
-    width: 33%;
-    height: 54px;
-    border: 1px dashed #8ea3c7;
-    border-radius: 8px;
-    text-align: center;
-    vertical-align: bottom;
-    color: #2a3d62;
-    font-weight: 600;
-    padding-bottom: 6px;
-    background: #fbfcff;
+    background: $hongsar-total-bg !important;
+    color: #102654;
+    border-top: 2px solid $hongsar-grid-border;
 }
 
 .hongsar-footer {
-    margin-top: 8px;
-    font-size: 10px;
-    color: #64748b;
+    margin-top: 10px;
+    color: #4b5f86;
+    border: none;
+    padding-top: 6px;
 }
 
 .hongsar-footer .page-number {
+    text-align: center;
+}
+
+.hongsar-invoice-wrap {
+    color: #263247;
+    border: none;
+    padding: 8px;
+    background: #ffffff;
+}
+
+.inv-top-header {
+    display: grid;
+    grid-template-columns: 86px 1fr 1fr;
+    border: none;
+    background: transparent;
+    align-items: start;
+}
+
+.inv-logo-col {
+    padding: 4px;
+    border: none;
+    background: transparent;
+}
+
+.inv-logo {
+    max-height: 56px;
+    max-width: 76px;
+    object-fit: contain;
+}
+
+.inv-company-col {
+    padding: 4px 8px;
+    line-height: 1.35;
+    font-size: 1em;
+    background: transparent;
+    border: none;
+}
+
+.inv-customer-col {
+    padding: 4px 8px;
+    line-height: 1.35;
+    font-size: 1em;
     text-align: right;
+    background: transparent;
+    border: none;
+}
+
+.inv-company-name {
+    color: #b32323;
+    font-size: 1.1em;
+}
+
+.inv-strip {
+    text-align: center;
+    font-size: 0.95em;
+    padding: 2px 6px;
+    border: none;
+}
+
+.inv-strip-green {
+    background: #e7f6e7;
+    color: #2f5f2f;
+}
+
+.inv-strip-title {
+    background: $hongsar-doc-title-bg;
+    color: #ca2222;
+    font-size: 16px !important;
+    letter-spacing: 0.5px;
+    border: none;
+}
+
+.inv-meta-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 3px;
+    margin-bottom: 4px;
+    border: 1px solid $hongsar-grid-border;
+}
+
+.inv-meta-grid td {
+    border: 1px solid $hongsar-grid-border;
+    padding: 5px 7px;
+    vertical-align: top;
+    font-size: 1em;
+    line-height: 1.3;
+    background: $hongsar-cell-bg;
+}
+
+.meta-label {
+    color: $hongsar-blue-dark;
+}
+
+.inv-lines-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1em;
+    border: 1px solid $hongsar-grid-border;
+    margin-top: 4px;
+}
+
+.inv-lines-table th,
+.inv-lines-table td {
+    border: 1px solid $hongsar-grid-border;
+    padding: 5px 6px;
+    line-height: 1.25;
+}
+
+.inv-lines-table thead th {
+    background: $hongsar-table-head;
+    color: #2b3f66;
+    text-align: center;
+    white-space: nowrap;
+    border-color: $hongsar-grid-border;
+}
+
+.inv-lines-table tbody tr:nth-child(even) td {
+    background: $hongsar-cell-bg;
+}
+
+.inv-lines-table tbody tr:nth-child(odd) td {
+    background: #ffffff;
+}
+
+.inv-lines-table .w-no {
+    width: 3%;
+}
+
+.inv-lines-table .w-code {
+    width: 8%;
+}
+
+.inv-lines-table .w-desc {
+    width: 22%;
+}
+
+.inv-lines-table .w-name {
+    width: 24%;
+}
+
+.inv-lines-table .w-case {
+    width: 10%;
+}
+
+.inv-lines-table .w-qty {
+    width: 8%;
+}
+
+.inv-lines-table .w-unit {
+    width: 10%;
+}
+
+.inv-lines-table .w-amt {
+    width: 15%;
+}
+
+.inv-lines-table tfoot .sum-label {
+    text-align: right;
+    background: #ffe7cc;
+    color: #8e4f1a;
+    border-top: 2px solid $hongsar-grid-border;
+}
+
+.inv-lines-table tfoot .sum-value {
+    text-align: right;
+    background: #ffe1bf;
+    color: #7f4317;
+    border-top: 2px solid $hongsar-grid-border;
+}
+
+.inv-status-box {
+    width: 150px;
+    margin: 12px auto 0;
+    text-align: center;
+    border: 2px solid #ef9d5c;
+    padding: 6px 8px;
+    font-size: 22px !important;
+    color: #2e2a1f;
+    background: #fffdfa;
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Load Pyidaungsu @font-face into report PDF/HTML (same pattern as hongsar_org_reports_fix_mod). -->
+    <template id="report_assets_common_pyidaungsu" inherit_id="web.report_layout">
+        <xpath expr="//t[@t-call-assets='web.report_assets_common']" position="after">
+            <link rel="stylesheet"
+                  type="text/css"
+                  href="/hongsar_reports/static/src/css/report_fonts.css"/>
+        </xpath>
+    </template>
+
+    <template id="report_preview_assets_pyidaungsu" inherit_id="web.report_preview_layout">
+        <xpath expr="//t[@t-call-assets='web.report_assets_common']" position="after">
+            <link rel="stylesheet"
+                  type="text/css"
+                  href="/hongsar_reports/static/src/css/report_fonts.css"/>
+        </xpath>
+    </template>
+</odoo>

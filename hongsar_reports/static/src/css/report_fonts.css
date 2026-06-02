@@ -14,8 +14,9 @@
     font-style: normal;
 }
 
-/* Myanmar font for all report output (PDF + HTML preview) */
+/* Apply Pyidaungsu to all report elements */
 body,
+body.o_body_pdf,
 .page,
 table,
 td,
@@ -36,12 +37,39 @@ i,
 em,
 small,
 .o_report_layout,
-.article {
-    font-family: 'Pyidaungsu', 'Pyidaungsu Regular', 'Noto Sans Myanmar', 'Padauk', sans-serif !important;
+.article,
+.hongsar-report-wrap,
+.hongsar-report-wrap table,
+.hongsar-report-wrap td,
+.hongsar-report-wrap th,
+.hongsar-report-wrap div,
+.hongsar-report-wrap span,
+.hongsar-report-wrap p,
+.hongsar-report-wrap h1,
+.hongsar-report-wrap h2,
+.hongsar-report-wrap .formal-report-page,
+.hongsar-report-wrap .formal-report-page * {
+    font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif !important;
+    font-size: 16px !important;
+    line-height: 1.45 !important;
+}
+
+.hongsar-invoice-wrap,
+.hongsar-invoice-wrap table,
+.hongsar-invoice-wrap td,
+.hongsar-invoice-wrap th,
+.hongsar-invoice-wrap div,
+.hongsar-invoice-wrap span,
+.hongsar-invoice-wrap p,
+.hongsar-invoice-wrap * {
+    font-family: 'Noto Sans Myanmar', 'Pyidaungsu', 'Padauk', sans-serif !important;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
 }
 
 strong,
 b,
+th,
 h1,
 h2,
 h3,
@@ -49,25 +77,4 @@ h4,
 h5,
 h6 {
     font-weight: bold;
-}
-
-/* Sale order lines: narrow unit price, clip long amounts */
-table.o_main_table th[name='th_priceunit'],
-table.o_main_table td[name='td_priceunit'] {
-    width: 52px !important;
-    max-width: 52px !important;
-    min-width: 52px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    padding-left: 2px !important;
-    padding-right: 2px !important;
-    font-size: 0.9em;
-}
-
-table.o_main_table td[name='td_priceunit'] > span {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
