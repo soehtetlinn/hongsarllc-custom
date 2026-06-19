@@ -7,6 +7,15 @@
         <field name="arch" type="xml">
             <xpath expr="//group[@name='order_details']/field[@name='validity_date']" position="after">
                 <field name="own_date" readonly="state in ['sale', 'cancel']"/>
+                <field name="is_charged_stripe_fees" readonly="state in ['sale', 'cancel']"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list" position="inside">
+                <field name="is_stripe_service_charge" column_invisible="True"/>
+                <field name="stripe_charge_fee_type" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form" position="inside">
+                <field name="is_stripe_service_charge" invisible="1"/>
+                <field name="stripe_charge_fee_type" invisible="1"/>
             </xpath>
         </field>
     </record>

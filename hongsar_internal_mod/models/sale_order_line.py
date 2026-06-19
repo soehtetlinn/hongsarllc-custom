@@ -8,6 +8,19 @@ from odoo.tools.translate import _
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
+    is_stripe_service_charge = fields.Boolean(
+        string="Is Stripe Service Charge",
+        default=False,
+    )
+    stripe_charge_fee_type = fields.Selection(
+        selection=[
+            ("base_fees", "Base Fees"),
+            ("amt", "Fixed Amount"),
+        ],
+        string="Stripe Charge Type",
+        copy=False,
+    )
+
     product_id = fields.Many2one(
         context={"hongsar_order_by_internal_ref": True},
         domain="["
@@ -26,6 +39,20 @@ class SaleOrderLine(models.Model):
         "('x_studio_visible_company', '=', company_id)"
         "]",
     )
+
+    def _is_not_sellable_line(self):
+        return self.is_stripe_service_charge or super()._is_not_sellable_line()
+
+    def _check_line_unlink(self):
+        undeletable_lines = super()._check_line_unlink()
+        return undeletable_lines.filtered(lambda line: not line.is_stripe_service_charge)
+
+    def _is_stripe_service_charge_line(self):
+        self.ensure_one()
+        order = self.order_id
+        if not order:
+            return bool(self.is_stripe_service_charge)
+        return order._is_stripe_service_charge_line(self)
 
     @api.constrains("product_id", "company_id", "display_type")
     def _check_product_visible_company_sale(self):

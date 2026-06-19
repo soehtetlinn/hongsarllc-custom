@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_stripe_service_charge" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.stripe.service.charge</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='pricing_setting_container']" position="inside">
+                <setting id="stripe_service_charge_setting"
+                         string="Stripe Service Charge"
+                         help="Stripe-style fees (e.g. 2.9% + $0.30) added when 'Charge Stripe Fees' is enabled on a sales order.">
+                    <div class="content-group">
+                        <div class="row mt16">
+                            <label for="stripe_service_charge_percent" class="col-lg-3 o_light_label"/>
+                            <field name="stripe_service_charge_percent" class="oe_inline"/> %
+                        </div>
+                        <div class="row">
+                            <label for="stripe_service_charge_fixed_amount" class="col-lg-3 o_light_label"/>
+                            <field name="stripe_service_charge_fixed_amount" class="oe_inline"/>
+                        </div>
+                        <div class="row">
+                            <label for="stripe_service_charge_base_product_id" class="col-lg-3 o_light_label"/>
+                            <field name="stripe_service_charge_base_product_id" options="{'no_create': True}"/>
+                        </div>
+                        <div class="row">
+                            <label for="stripe_service_charge_amt_product_id" class="col-lg-3 o_light_label"/>
+                            <field name="stripe_service_charge_amt_product_id" options="{'no_create': True}"/>
+                        </div>
+                    </div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
